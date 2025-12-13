@@ -1,0 +1,177 @@
+﻿[
+    {
+        "id":  "equip-1",
+        "name":  "거울갑옷",
+        "src":  "/assets/equip/armor/거울갑옷.png"
+    },
+    {
+        "id":  "equip-2",
+        "name":  "로얄카우아머",
+        "src":  "/assets/equip/armor/로얄카우아머.png"
+    },
+    {
+        "id":  "equip-3",
+        "name":  "성화기사단갑옷",
+        "src":  "/assets/equip/armor/성화기사단갑옷.png"
+    },
+    {
+        "id":  "equip-4",
+        "name":  "앱솔루트픽스아머",
+        "src":  "/assets/equip/armor/앱솔루트픽스아머.png"
+    },
+    {
+        "id":  "equip-5",
+        "name":  "염제갑옷",
+        "src":  "/assets/equip/armor/염제갑옷.png"
+    },
+    {
+        "id":  "equip-6",
+        "name":  "템페스트아머",
+        "src":  "/assets/equip/armor/템페스트아머.png"
+    },
+    {
+        "id":  "equip-7",
+        "name":  "황금갑옷",
+        "src":  "/assets/equip/armor/황금갑옷.png"
+    },
+    {
+        "id":  "equip-8",
+        "name":  "둔갑천서",
+        "src":  "/assets/equip/helmet/둔갑천서.png"
+    },
+    {
+        "id":  "equip-9",
+        "name":  "로얄카우크라운",
+        "src":  "/assets/equip/helmet/로얄카우크라운.png"
+    },
+    {
+        "id":  "equip-10",
+        "name":  "성화기사단투구",
+        "src":  "/assets/equip/helmet/성화기사단투구.png"
+    },
+    {
+        "id":  "equip-11",
+        "name":  "아이기스",
+        "src":  "/assets/equip/helmet/아이기스.png"
+    },
+    {
+        "id":  "equip-12",
+        "name":  "적토마",
+        "src":  "/assets/equip/helmet/적토마.png"
+    },
+    {
+        "id":  "equip-13",
+        "name":  "질투의비수",
+        "src":  "/assets/equip/helmet/질투의비수.png"
+    },
+    {
+        "id":  "equip-14",
+        "name":  "티아마트경전",
+        "src":  "/assets/equip/helmet/티아마트경전.png"
+    },
+    {
+        "id":  "equip-15",
+        "name":  "페가수스",
+        "src":  "/assets/equip/helmet/페가수스.png"
+    },
+    {
+        "id":  "equip-16",
+        "name":  "로얄카우룬",
+        "src":  "/assets/equip/roon/로얄카우룬.png"
+    },
+    {
+        "id":  "equip-17",
+        "name":  "염제의기억",
+        "src":  "/assets/equip/roon/염제의기억.png"
+    },
+    {
+        "id":  "equip-18",
+        "name":  "천둥심장",
+        "src":  "/assets/equip/roon/천둥심장.png"
+    },
+    {
+        "id":  "equip-19",
+        "name":  "천상의룬",
+        "src":  "/assets/equip/roon/천상의룬.png"
+    },
+    {
+        "id":  "equip-20",
+        "name":  "클라우솔리스",
+        "src":  "/assets/equip/roon/클라우솔리스.png"
+    },
+    {
+        "id":  "equip-21",
+        "name":  "감반테인",
+        "src":  "/assets/equip/weapon/감반테인.png"
+    },
+    {
+        "id":  "equip-22",
+        "name":  "듀얼블레이드",
+        "src":  "/assets/equip/weapon/듀얼블레이드.png"
+    },
+    {
+        "id":  "equip-23",
+        "name":  "바라사다",
+        "src":  "/assets/equip/weapon/바라사다.png"
+    },
+    {
+        "id":  "equip-24",
+        "name":  "사지타리우스",
+        "src":  "/assets/equip/weapon/사지타리우스.png"
+    },
+    {
+        "id":  "equip-25",
+        "name":  "썬더클랩",
+        "src":  "/assets/equip/weapon/썬더클랩.png"
+    },
+    {
+        "id":  "equip-26",
+        "name":  "아론다이트",
+        "src":  "/assets/equip/weapon/아론다이트.png"
+    },
+    {
+        "id":  "equip-27",
+        "name":  "에쿠아리우스",
+        "src":  "/assets/equip/weapon/에쿠아리우스.png"
+    },
+    {
+        "id":  "equip-28",
+        "name":  "여신의지팡이",
+        "src":  "/assets/equip/weapon/여신의지팡이.png"
+    },
+    {
+        "id":  "equip-29",
+        "name":  "여신의활",
+        "src":  "/assets/equip/weapon/여신의활.png"
+    },
+    {
+        "id":  "equip-30",
+        "name":  "이오케이라",
+        "src":  "/assets/equip/weapon/이오케이라.png"
+    },
+    {
+        "id":  "equip-31",
+        "name":  "인피니티스태프",
+        "src":  "/assets/equip/weapon/인피니티스태프.png"
+    },
+    {
+        "id":  "equip-32",
+        "name":  "템페스트보우",
+        "src":  "/assets/equip/weapon/템페스트보우.png"
+    },
+    {
+        "id":  "equip-33",
+        "name":  "템페스트소드",
+        "src":  "/assets/equip/weapon/템페스트소드.png"
+    },
+    {
+        "id":  "equip-34",
+        "name":  "트리아이나",
+        "src":  "/assets/equip/weapon/트리아이나.png"
+    },
+    {
+        "id":  "equip-35",
+        "name":  "페일노트",
+        "src":  "/assets/equip/weapon/페일노트.png"
+    }
+]

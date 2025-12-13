@@ -1,0 +1,217 @@
+﻿[
+    {
+        "id":  "card-4",
+        "name":  "각성한힘",
+        "src":  "/assets/cards/각성한힘.png"
+    },
+    {
+        "id":  "card-5",
+        "name":  "갈증의끝에서",
+        "src":  "/assets/cards/갈증의끝에서.png"
+    },
+    {
+        "id":  "card-6",
+        "name":  "강인한힘",
+        "src":  "/assets/cards/강인한힘.png"
+    },
+    {
+        "id":  "card-7",
+        "name":  "광기",
+        "src":  "/assets/cards/광기.png"
+    },
+    {
+        "id":  "card-8",
+        "name":  "녹색의허리띠",
+        "src":  "/assets/cards/녹색의허리띠.png"
+    },
+    {
+        "id":  "card-9",
+        "name":  "뜨거운시선",
+        "src":  "/assets/cards/뜨거운시선.png"
+    },
+    {
+        "id":  "card-10",
+        "name":  "매혹",
+        "src":  "/assets/cards/매혹.png"
+    },
+    {
+        "id":  "card-11",
+        "name":  "미소의공주",
+        "src":  "/assets/cards/미소의공주.png"
+    },
+    {
+        "id":  "card-12",
+        "name":  "복수의눈",
+        "src":  "/assets/cards/복수의눈.png"
+    },
+    {
+        "id":  "card-13",
+        "name":  "복종",
+        "src":  "/assets/cards/복종.png"
+    },
+    {
+        "id":  "card-14",
+        "name":  "빗나가지않는활",
+        "src":  "/assets/cards/빗나가지않는활.png"
+    },
+    {
+        "id":  "card-15",
+        "name":  "빛의마녀",
+        "src":  "/assets/cards/빛의마녀.png"
+    },
+    {
+        "id":  "card-16",
+        "name":  "서투른연심",
+        "src":  "/assets/cards/서투른연심.png"
+    },
+    {
+        "id":  "card-17",
+        "name":  "성검의가호",
+        "src":  "/assets/cards/성검의가호.png"
+    },
+    {
+        "id":  "card-18",
+        "name":  "성배의정령",
+        "src":  "/assets/cards/성배의정령.png"
+    },
+    {
+        "id":  "card-19",
+        "name":  "소녀의비밀",
+        "src":  "/assets/cards/소녀의비밀.png"
+    },
+    {
+        "id":  "card-20",
+        "name":  "수룡의가호",
+        "src":  "/assets/cards/수룡의가호.png"
+    },
+    {
+        "id":  "card-21",
+        "name":  "순결의기사",
+        "src":  "/assets/cards/순결의기사.png"
+    },
+    {
+        "id":  "card-22",
+        "name":  "스며든관능",
+        "src":  "/assets/cards/스며든관능.png"
+    },
+    {
+        "id":  "card-23",
+        "name":  "식객",
+        "src":  "/assets/cards/식객.png"
+    },
+    {
+        "id":  "card-24",
+        "name":  "앱솔루트픽스아머",
+        "src":  "/assets/cards/앱솔루트픽스아머.png"
+    },
+    {
+        "id":  "card-25",
+        "name":  "어둠속미소",
+        "src":  "/assets/cards/어둠속미소.png"
+    },
+    {
+        "id":  "card-26",
+        "name":  "언제나함께",
+        "src":  "/assets/cards/언제나함께.png"
+    },
+    {
+        "id":  "card-27",
+        "name":  "얼음여제",
+        "src":  "/assets/cards/얼음여제.png"
+    },
+    {
+        "id":  "card-28",
+        "name":  "엘그라드검술일지",
+        "src":  "/assets/cards/엘그라드검술일지.png"
+    },
+    {
+        "id":  "card-29",
+        "name":  "여왕의아침",
+        "src":  "/assets/cards/여왕의아침.png"
+    },
+    {
+        "id":  "card-30",
+        "name":  "염제",
+        "src":  "/assets/cards/염제.png"
+    },
+    {
+        "id":  "card-31",
+        "name":  "요정왕",
+        "src":  "/assets/cards/요정왕.png"
+    },
+    {
+        "id":  "card-32",
+        "name":  "월하검무",
+        "src":  "/assets/cards/월하검무.png"
+    },
+    {
+        "id":  "card-33",
+        "name":  "장미불꽃",
+        "src":  "/assets/cards/장미불꽃.png"
+    },
+    {
+        "id":  "card-34",
+        "name":  "절세의의술",
+        "src":  "/assets/cards/절세의의술.png"
+    },
+    {
+        "id":  "card-35",
+        "name":  "점장의품격",
+        "src":  "/assets/cards/점장의품격.png"
+    },
+    {
+        "id":  "card-36",
+        "name":  "종신계약",
+        "src":  "/assets/cards/종신계약.png"
+    },
+    {
+        "id":  "card-37",
+        "name":  "즉시반격",
+        "src":  "/assets/cards/즉시반격.png"
+    },
+    {
+        "id":  "card-38",
+        "name":  "체술연마",
+        "src":  "/assets/cards/체술연마.png"
+    },
+    {
+        "id":  "card-39",
+        "name":  "카르페디엠",
+        "src":  "/assets/cards/카르페디엠.png"
+    },
+    {
+        "id":  "card-40",
+        "name":  "투쟁정신",
+        "src":  "/assets/cards/투쟁정신.png"
+    },
+    {
+        "id":  "card-41",
+        "name":  "티타노마키아",
+        "src":  "/assets/cards/티타노마키아.png"
+    },
+    {
+        "id":  "card-42",
+        "name":  "파멸의여신",
+        "src":  "/assets/cards/파멸의여신.png"
+    },
+    {
+        "id":  "card-43",
+        "name":  "퍼스트택틱스",
+        "src":  "/assets/cards/퍼스트택틱스.png"
+    },
+    {
+        "id":  "card-44",
+        "name":  "프리드웬",
+        "src":  "/assets/cards/프리드웬.png"
+    },
+    {
+        "id":  "card-45",
+        "name":  "흘리기",
+        "src":  "/assets/cards/흘리기.png"
+    },
+    {
+        "id":  "card-46",
+        "name":  "고요속의유혹",
+        "src":  "/assets/cards/고요속의유혹.png"
+    }
+]

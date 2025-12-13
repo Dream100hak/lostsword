@@ -1,0 +1,177 @@
+﻿[
+    {
+        "id":  "pet-4",
+        "name":  "갤러해드",
+        "src":  "/assets/pets/갤러해드.png"
+    },
+    {
+        "id":  "pet-5",
+        "name":  "그리폰",
+        "src":  "/assets/pets/그리폰.png"
+    },
+    {
+        "id":  "pet-6",
+        "name":  "기네비어",
+        "src":  "/assets/pets/기네비어.png"
+    },
+    {
+        "id":  "pet-7",
+        "name":  "디안케트",
+        "src":  "/assets/pets/디안케트.png"
+    },
+    {
+        "id":  "pet-8",
+        "name":  "란",
+        "src":  "/assets/pets/란.png"
+    },
+    {
+        "id":  "pet-9",
+        "name":  "란슬롯",
+        "src":  "/assets/pets/란슬롯.png"
+    },
+    {
+        "id":  "pet-10",
+        "name":  "로엔그린",
+        "src":  "/assets/pets/로엔그린.png"
+    },
+    {
+        "id":  "pet-11",
+        "name":  "루아",
+        "src":  "/assets/pets/루아.png"
+    },
+    {
+        "id":  "pet-12",
+        "name":  "리사",
+        "src":  "/assets/pets/리사.png"
+    },
+    {
+        "id":  "pet-13",
+        "name":  "릴리스",
+        "src":  "/assets/pets/릴리스.png"
+    },
+    {
+        "id":  "pet-14",
+        "name":  "멀린",
+        "src":  "/assets/pets/멀린.png"
+    },
+    {
+        "id":  "pet-15",
+        "name":  "모르가나",
+        "src":  "/assets/pets/모르가나.png"
+    },
+    {
+        "id":  "pet-16",
+        "name":  "베디비어",
+        "src":  "/assets/pets/베디비어.png"
+    },
+    {
+        "id":  "pet-17",
+        "name":  "벨시",
+        "src":  "/assets/pets/벨시.png"
+    },
+    {
+        "id":  "pet-18",
+        "name":  "비비안",
+        "src":  "/assets/pets/비비안.png"
+    },
+    {
+        "id":  "pet-19",
+        "name":  "아네사",
+        "src":  "/assets/pets/아네사.png"
+    },
+    {
+        "id":  "pet-20",
+        "name":  "아테나",
+        "src":  "/assets/pets/아테나.png"
+    },
+    {
+        "id":  "pet-21",
+        "name":  "에린",
+        "src":  "/assets/pets/에린.png"
+    },
+    {
+        "id":  "pet-22",
+        "name":  "에바(구)",
+        "src":  "/assets/pets/에바(구).png"
+    },
+    {
+        "id":  "pet-23",
+        "name":  "에바",
+        "src":  "/assets/pets/에바.png"
+    },
+    {
+        "id":  "pet-24",
+        "name":  "에스테리아",
+        "src":  "/assets/pets/에스테리아.png"
+    },
+    {
+        "id":  "pet-25",
+        "name":  "엘리자베스",
+        "src":  "/assets/pets/엘리자베스.png"
+    },
+    {
+        "id":  "pet-26",
+        "name":  "이자벨",
+        "src":  "/assets/pets/이자벨.png"
+    },
+    {
+        "id":  "pet-27",
+        "name":  "잔다르크",
+        "src":  "/assets/pets/잔다르크.png"
+    },
+    {
+        "id":  "pet-28",
+        "name":  "진베디비어",
+        "src":  "/assets/pets/진베디비어.png"
+    },
+    {
+        "id":  "pet-29",
+        "name":  "카트린",
+        "src":  "/assets/pets/카트린.png"
+    },
+    {
+        "id":  "pet-30",
+        "name":  "케이",
+        "src":  "/assets/pets/케이.png"
+    },
+    {
+        "id":  "pet-31",
+        "name":  "크리스티나",
+        "src":  "/assets/pets/크리스티나.png"
+    },
+    {
+        "id":  "pet-32",
+        "name":  "키르케",
+        "src":  "/assets/pets/키르케.png"
+    },
+    {
+        "id":  "pet-33",
+        "name":  "트리스탄",
+        "src":  "/assets/pets/트리스탄.png"
+    },
+    {
+        "id":  "pet-34",
+        "name":  "티아마트",
+        "src":  "/assets/pets/티아마트.png"
+    },
+    {
+        "id":  "pet-35",
+        "name":  "팔라메데스",
+        "src":  "/assets/pets/팔라메데스.png"
+    },
+    {
+        "id":  "pet-36",
+        "name":  "펜리르",
+        "src":  "/assets/pets/펜리르.png"
+    },
+    {
+        "id":  "pet-37",
+        "name":  "피닉스",
+        "src":  "/assets/pets/피닉스.png"
+    },
+    {
+        "id":  "pet-38",
+        "name":  "해변의메리",
+        "src":  "/assets/pets/해변의메리.png"
+    }
+]

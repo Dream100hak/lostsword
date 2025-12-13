@@ -1,0 +1,33 @@
+{
+  "name": "lostsword",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "autoprefixer": "10.4.20",
+    "classnames": "2.5.1",
+    "html2canvas": "1.4.1",
+    "next": "14.2.5",
+    "nanoid": "5.0.7",
+    "postcss": "8.4.45",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-draggable": "4.4.6",
+    "react-rnd": "10.4.12",
+    "tailwindcss": "3.4.10",
+    "zustand": "4.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "22.7.4",
+    "@types/react": "18.3.11",
+    "@types/react-dom": "18.3.0",
+    "eslint": "8.57.1",
+    "eslint-config-next": "14.2.5",
+    "typescript": "5.6.3"
+  }
+}

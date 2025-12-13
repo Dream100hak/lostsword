@@ -1,0 +1,13 @@
+<svg width="280" height="280" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pg3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+  </defs>
+  <rect width="280" height="280" rx="26" fill="url(#pg3)"/>
+  <path d="M40 210 Q140 120 240 210" stroke="#f9a8d4" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="10 8"/>
+  <circle cx="90" cy="90" r="44" fill="rgba(249,168,212,0.3)"/>
+  <text x="50%" y="52%" dominant-baseline="middle" text-anchor="middle" fill="#f3e8ff" font-family="Segoe UI, sans-serif" font-size="26" font-weight="800">티아</text>
+  <text x="50%" y="64%" dominant-baseline="middle" text-anchor="middle" fill="#e2e8f0" font-family="Segoe UI, sans-serif" font-size="16" opacity="0.9">PET 03</text>
+</svg>

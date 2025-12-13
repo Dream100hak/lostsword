@@ -1,0 +1,14 @@
+<svg width="320" height="440" viewBox="0 0 320 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#4b5563"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="320" height="440" rx="18" fill="url(#g3)"/>
+  <path d="M30 340 C120 260 200 400 290 320" stroke="#a78bfa" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="8 10"/>
+  <circle cx="90" cy="110" r="55" fill="rgba(167,139,250,0.35)"/>
+  <circle cx="240" cy="180" r="70" fill="rgba(76,29,149,0.35)"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#e5e7eb" font-family="Segoe UI, sans-serif" font-size="30" font-weight="700">다크니스</text>
+  <text x="50%" y="60%" dominant-baseline="middle" text-anchor="middle" fill="#c7d2fe" font-family="Segoe UI, sans-serif" font-size="16" opacity="0.85">CARD 03</text>
+</svg>

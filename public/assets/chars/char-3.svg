@@ -1,0 +1,12 @@
+<svg width="360" height="480" viewBox="0 0 360 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cg3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="480" rx="22" fill="url(#cg3)"/>
+  <path d="M30 360 C130 260 230 460 330 320" stroke="rgba(255,255,255,0.7)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="12 10"/>
+  <text x="50%" y="52%" dominant-baseline="middle" text-anchor="middle" fill="#e0e7ff" font-family="Segoe UI, sans-serif" font-size="34" font-weight="800">티아마트</text>
+  <text x="50%" y="62%" dominant-baseline="middle" text-anchor="middle" fill="#c7d2fe" font-family="Segoe UI, sans-serif" font-size="18" opacity="0.85">CHAR 03</text>
+</svg>

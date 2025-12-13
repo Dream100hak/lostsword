@@ -1,0 +1,13 @@
+<svg width="320" height="440" viewBox="0 0 320 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#14b8a6"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="320" height="440" rx="18" fill="url(#g1)"/>
+  <circle cx="80" cy="90" r="36" fill="rgba(255,255,255,0.25)"/>
+  <circle cx="240" cy="140" r="56" fill="rgba(255,255,255,0.18)"/>
+  <text x="50%" y="52%" dominant-baseline="middle" text-anchor="middle" fill="#fff" font-family="Segoe UI, sans-serif" font-size="32" font-weight="700">에테르</text>
+  <text x="50%" y="62%" dominant-baseline="middle" text-anchor="middle" fill="#e2e8f0" font-family="Segoe UI, sans-serif" font-size="16" opacity="0.85">CARD 01</text>
+</svg>

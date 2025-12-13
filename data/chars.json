@@ -1,0 +1,192 @@
+﻿[
+    {
+        "id":  "char-4",
+        "name":  "가웨인",
+        "src":  "/assets/chars/가웨인.png"
+    },
+    {
+        "id":  "char-5",
+        "name":  "갤러해드",
+        "src":  "/assets/chars/갤러해드.png"
+    },
+    {
+        "id":  "char-6",
+        "name":  "기네비어",
+        "src":  "/assets/chars/기네비어.png"
+    },
+    {
+        "id":  "char-7",
+        "name":  "디안케트",
+        "src":  "/assets/chars/디안케트.png"
+    },
+    {
+        "id":  "char-8",
+        "name":  "란",
+        "src":  "/assets/chars/란.png"
+    },
+    {
+        "id":  "char-9",
+        "name":  "란슬롯",
+        "src":  "/assets/chars/란슬롯.png"
+    },
+    {
+        "id":  "char-10",
+        "name":  "로엔그린",
+        "src":  "/assets/chars/로엔그린.png"
+    },
+    {
+        "id":  "char-11",
+        "name":  "루시",
+        "src":  "/assets/chars/루시.png"
+    },
+    {
+        "id":  "char-12",
+        "name":  "루아",
+        "src":  "/assets/chars/루아.png"
+    },
+    {
+        "id":  "char-13",
+        "name":  "리사",
+        "src":  "/assets/chars/리사.png"
+    },
+    {
+        "id":  "char-14",
+        "name":  "리아",
+        "src":  "/assets/chars/리아.png"
+    },
+    {
+        "id":  "char-15",
+        "name":  "릴리스",
+        "src":  "/assets/chars/릴리스.png"
+    },
+    {
+        "id":  "char-16",
+        "name":  "멀린",
+        "src":  "/assets/chars/멀린.png"
+    },
+    {
+        "id":  "char-17",
+        "name":  "모르가나",
+        "src":  "/assets/chars/모르가나.png"
+    },
+    {
+        "id":  "char-18",
+        "name":  "모르가즈",
+        "src":  "/assets/chars/모르가즈.png"
+    },
+    {
+        "id":  "char-19",
+        "name":  "미아",
+        "src":  "/assets/chars/미아.png"
+    },
+    {
+        "id":  "char-20",
+        "name":  "벨시",
+        "src":  "/assets/chars/벨시.png"
+    },
+    {
+        "id":  "char-21",
+        "name":  "비비안",
+        "src":  "/assets/chars/비비안.png"
+    },
+    {
+        "id":  "char-22",
+        "name":  "아네사",
+        "src":  "/assets/chars/아네사.png"
+    },
+    {
+        "id":  "char-23",
+        "name":  "에린",
+        "src":  "/assets/chars/에린.png"
+    },
+    {
+        "id":  "char-24",
+        "name":  "에바",
+        "src":  "/assets/chars/에바.png"
+    },
+    {
+        "id":  "char-25",
+        "name":  "엔야",
+        "src":  "/assets/chars/엔야.png"
+    },
+    {
+        "id":  "char-26",
+        "name":  "엘리자베스",
+        "src":  "/assets/chars/엘리자베스.png"
+    },
+    {
+        "id":  "char-27",
+        "name":  "이자벨",
+        "src":  "/assets/chars/이자벨.png"
+    },
+    {
+        "id":  "char-28",
+        "name":  "이졸데",
+        "src":  "/assets/chars/이졸데.png"
+    },
+    {
+        "id":  "char-29",
+        "name":  "잔다르크",
+        "src":  "/assets/chars/잔다르크.png"
+    },
+    {
+        "id":  "char-30",
+        "name":  "진베디비어",
+        "src":  "/assets/chars/진베디비어.png"
+    },
+    {
+        "id":  "char-31",
+        "name":  "카트린",
+        "src":  "/assets/chars/카트린.png"
+    },
+    {
+        "id":  "char-32",
+        "name":  "케이",
+        "src":  "/assets/chars/케이.png"
+    },
+    {
+        "id":  "char-33",
+        "name":  "크리스티나",
+        "src":  "/assets/chars/크리스티나.png"
+    },
+    {
+        "id":  "char-34",
+        "name":  "클레어",
+        "src":  "/assets/chars/클레어.png"
+    },
+    {
+        "id":  "char-35",
+        "name":  "키르케",
+        "src":  "/assets/chars/키르케.png"
+    },
+    {
+        "id":  "char-36",
+        "name":  "트리스탄",
+        "src":  "/assets/chars/트리스탄.png"
+    },
+    {
+        "id":  "char-37",
+        "name":  "티아마트",
+        "src":  "/assets/chars/티아마트.png"
+    },
+    {
+        "id":  "char-38",
+        "name":  "팔라메데스",
+        "src":  "/assets/chars/팔라메데스.png"
+    },
+    {
+        "id":  "char-39",
+        "name":  "퍼시벌",
+        "src":  "/assets/chars/퍼시벌.png"
+    },
+    {
+        "id":  "char-40",
+        "name":  "해변의메리",
+        "src":  "/assets/chars/해변의메리.png"
+    },
+    {
+        "id":  "char-41",
+        "name":  "에스테리아",
+        "src":  "/assets/chars/에스테리아.png"
+    }
+]
