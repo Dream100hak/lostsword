@@ -173,5 +173,10 @@
         "id":  "pet-38",
         "name":  "해변의메리",
         "src":  "/assets/pets/해변의메리.png"
+    },
+    {
+        "id":  "pet-39",
+        "name":  "모건르페이",
+        "src":  "/assets/pets/모건르페이.png"
     }
 ]

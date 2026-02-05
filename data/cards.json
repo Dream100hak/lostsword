@@ -213,5 +213,15 @@
         "id":  "card-46",
         "name":  "고요속의유혹",
         "src":  "/assets/cards/고요속의유혹.png"
+    },
+    {
+        "id":  "card-47",
+        "name":  "여왕님의유혹",
+        "src":  "/assets/cards/여왕님의유혹.png"
+    },
+    {
+        "id":  "card-48",
+        "name":  "붉은용의가호",
+        "src":  "/assets/cards/붉은용의가호.png"
     }
 ]

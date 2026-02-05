@@ -188,5 +188,15 @@
         "id":  "char-41",
         "name":  "에스테리아",
         "src":  "/assets/chars/에스테리아.png"
+    },
+    {
+        "id":  "char-42",
+        "name":  "모건르페이",
+        "src":  "/assets/chars/모건르페이.png"
+    },
+    {
+        "id":  "char-43",
+        "name":  "루에이라",
+        "src":  "/assets/chars/루에이라.png"
     }
 ]

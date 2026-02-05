@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "id":  "equip-1",
         "name":  "거울갑옷",
@@ -173,5 +173,75 @@
         "id":  "equip-35",
         "name":  "페일노트",
         "src":  "/assets/equip/weapon/페일노트.png"
+    },
+    {
+        "id":  "equip-36",
+        "name":  "멀린의로브",
+        "src":  "/assets/equip/armor/멀린의로브.png"
+    },
+    {
+        "id":  "equip-37",
+        "name":  "프라가라흐",
+        "src":  "/assets/equip/weapon/프라가라흐.png"
+    },
+    {
+        "id":  "equip-38",
+        "name":  "야성의전투슈트",
+        "src":  "/assets/equip/armor/야성의전투슈트.png"
+    },
+    {
+        "id":  "equip-39",
+        "name":  "데스실드",
+        "src":  "/assets/equip/helmet/데스실드.png"
+    },
+    {
+        "id":  "equip-40",
+        "name":  "야성의헤어밴드",
+        "src":  "/assets/equip/helmet/야성의헤어밴드.png"
+    },
+    {
+        "id":  "equip-41",
+        "name":  "룬오브딥시",
+        "src":  "/assets/equip/roon/룬오브딥시.png"
+    },
+    {
+        "id":  "equip-42",
+        "name":  "야성의룬",
+        "src":  "/assets/equip/roon/야성의룬.png"
+    },
+    {
+        "id":  "equip-43",
+        "name":  "렘페이지보우",
+        "src":  "/assets/equip/weapon/렘페이지보우.png"
+    },
+    {
+        "id":  "equip-44",
+        "name":  "로얄카우엑스",
+        "src":  "/assets/equip/weapon/로얄카우엑스.png"
+    },
+    {
+        "id":  "equip-45",
+        "name":  "보이드스태프",
+        "src":  "/assets/equip/weapon/보이드스태프.png"
+    },
+    {
+        "id":  "equip-46",
+        "name":  "야성의나기나타",
+        "src":  "/assets/equip/weapon/야성의나기나타.png"
+    },
+    {
+        "id":  "equip-47",
+        "name":  "야성의머스킷",
+        "src":  "/assets/equip/weapon/야성의머스킷.png"
+    },
+    {
+        "id":  "equip-48",
+        "name":  "야성의스태프",
+        "src":  "/assets/equip/weapon/야성의스태프.png"
+    },
+    {
+        "id":  "equip-49",
+        "name":  "코스믹엑스",
+        "src":  "/assets/equip/weapon/코스믹엑스.png"
     }
 ]
