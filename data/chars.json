@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "id":  "char-4",
         "name":  "가웨인",
@@ -198,5 +198,10 @@
         "id":  "char-43",
         "name":  "루에이라",
         "src":  "/assets/chars/루에이라.png"
+    },
+    {
+        "id":  "char-44",
+        "name":  "네샤",
+        "src":  "/assets/chars/네샤.png"
     }
 ]

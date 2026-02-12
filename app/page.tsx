@@ -710,8 +710,8 @@ export default function Page() {
       <div
         className={
           isEquip
-            ? "flex-1 space-y-3 overflow-y-auto pr-1 scrollbar-thin min-h-0"
-            : "flex-1 space-y-2 overflow-y-auto pr-1 scrollbar-thin min-h-0"
+            ? "flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin grid grid-cols-2 md:grid-cols-3 gap-3"
+            : "flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin grid grid-cols-2 md:grid-cols-3 gap-2"
         }
       >
         {sorted.map((entry) => (
@@ -1023,7 +1023,7 @@ export default function Page() {
           onClick={(e) => e.target === e.currentTarget && (setPicker(null), setSlotTarget(null))}
         >
           <div
-            className="flex max-h-[85vh] w-full max-w-lg flex-col gap-3 rounded-2xl border border-white/10 bg-slate-900 p-4 shadow-2xl shadow-black/50"
+            className="flex max-h-[85vh] w-full max-w-4xl flex-col gap-3 rounded-2xl border border-white/10 bg-slate-900 p-4 shadow-2xl shadow-black/50"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-shrink-0 items-center justify-between">
@@ -1044,13 +1044,8 @@ export default function Page() {
               </button>
             </div>
             <input
-              data-ime-field="search"
               value={search}
-              onChange={(e) =>
-                handleChangeUnlessComposing(setSearch, e.target.value)
-              }
-              onCompositionStart={() => setIsComposing(true)}
-              onCompositionEnd={handleCompositionEnd}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="검색..."
               className="w-full flex-shrink-0 rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
             />

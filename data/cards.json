@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "id":  "card-4",
         "name":  "각성한힘",
@@ -223,5 +223,10 @@
         "id":  "card-48",
         "name":  "붉은용의가호",
         "src":  "/assets/cards/붉은용의가호.png"
+    },
+    {
+        "id":  "card-49",
+        "name":  "조여드는 시선",
+        "src":  "/assets/cards/조여드는시선.png"
     }
 ]

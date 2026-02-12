@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "id":  "pet-4",
         "name":  "갤러해드",
@@ -178,5 +178,10 @@
         "id":  "pet-39",
         "name":  "모건르페이",
         "src":  "/assets/pets/모건르페이.png"
+    },
+    {
+        "id":  "pet-40",
+        "name":  "네샤",
+        "src":  "/assets/pets/네샤.png"
     }
 ]
