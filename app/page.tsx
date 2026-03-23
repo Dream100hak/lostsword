@@ -710,8 +710,8 @@ export default function Page() {
       <div
         className={
           isEquip
-            ? "flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin grid grid-cols-2 md:grid-cols-3 gap-3"
-            : "flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin grid grid-cols-2 md:grid-cols-3 gap-2"
+            ? "grid min-h-0 grid-cols-2 gap-3 md:grid-cols-3"
+            : "grid min-h-0 grid-cols-2 gap-2 md:grid-cols-3"
         }
       >
         {sorted.map((entry) => (
@@ -841,8 +841,8 @@ export default function Page() {
 
       <section className="flex justify-center relative">
         <div
-          className={`relative rounded border border-white/10 bg-canvas p-4 shadow-2xl shadow-black/50 ${
-            compactView ? "scale-[0.85] origin-top-left" : ""
+          className={`relative rounded border border-white/10 bg-canvas p-4 shadow-2xl shadow-black/50 origin-top-left ${
+            compactView ? "scale-[0.85]" : "scale-[1.1]"
           }`}
         >
           <PreviewCanvas
@@ -1023,7 +1023,7 @@ export default function Page() {
           onClick={(e) => e.target === e.currentTarget && (setPicker(null), setSlotTarget(null))}
         >
           <div
-            className="flex max-h-[85vh] w-full max-w-4xl flex-col gap-3 rounded-2xl border border-white/10 bg-slate-900 p-4 shadow-2xl shadow-black/50"
+            className="flex h-[min(85vh,56rem)] w-full max-w-4xl flex-col gap-3 rounded-2xl border border-white/10 bg-slate-900 p-4 shadow-2xl shadow-black/50"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-shrink-0 items-center justify-between">

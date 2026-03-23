@@ -183,5 +183,20 @@
         "id":  "pet-40",
         "name":  "네샤",
         "src":  "/assets/pets/네샤.png"
+    },
+    {
+        "id":  "pet-41",
+        "name":  "아스카",
+        "src":  "/assets/pets/아스카.png"
+    },
+    {
+        "id":  "pet-42",
+        "name":  "히카게",
+        "src":  "/assets/pets/히카게.png"
+    },
+    {
+        "id":  "pet-43",
+        "name":  "유미",
+        "src":  "/assets/pets/유미.png"
     }
 ]

@@ -203,5 +203,20 @@
         "id":  "char-44",
         "name":  "네샤",
         "src":  "/assets/chars/네샤.png"
+    },
+    {
+        "id":  "char-45",
+        "name":  "아스카",
+        "src":  "/assets/chars/아스카.png"
+    },
+    {
+        "id":  "char-46",
+        "name":  "히카게",
+        "src":  "/assets/chars/히카게.png"
+    },
+    {
+        "id":  "char-47",
+        "name":  "유미",
+        "src":  "/assets/chars/유미.png"
     }
 ]
