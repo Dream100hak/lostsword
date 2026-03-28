@@ -1200,7 +1200,7 @@ export default function Page() {
       <header className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-2xl font-bold tracking-tight text-white">
-            LostSword 아트 배치 에디터
+            LostSword 택틱 배치
           </h1>
           <div className="flex items-center gap-2">
             <button
@@ -1208,22 +1208,14 @@ export default function Page() {
               className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 hover:border-white/40 hover:bg-white/20"
             >
               저장 (PNG)
-            </button>
-            <button
-              onClick={() => setCompactView((v) => !v)}
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                compactView
-                  ? "bg-purple-600 text-white"
-                  : "border border-white/20 bg-white/10 text-white/80 hover:border-white/40"
-              }`}
-            >
-              {compactView ? "컴팩트 해제" : "컴팩트 보기"}
-            </button>
+            </button>         
           </div>
         </div>
       </header>
 
       <section className="mx-auto w-full max-w-6xl rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/90 shadow-inner shadow-black/20">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
+          <div className="min-w-0">
         <div className="mb-3 font-semibold text-white">장비 프리셋</div>
         <p className="mb-3 text-xs text-white/55">
           자주 쓰는 무기·갑옷·투구·룬 조합을 저장해 두었다가 슬롯에 한 번에 적용할 수 있습니다. 브라우저에 저장됩니다.
@@ -1324,6 +1316,73 @@ export default function Page() {
             ))}
           </ul>
         )}
+          </div>
+          <div className="min-w-0 border-t border-white/10 pt-6 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0">
+            <div className="mb-3 font-semibold text-white">택틱 조합 (전체 배치) 프리셋</div>
+            <p className="mb-3 text-xs text-white/55">
+              캔버스에 올려 둔 5슬롯(캐릭터·카드·장비), 펫 3칸, 오른쪽 노트까지 한 번에 저장·복원합니다. PNG
+              저장과 별개로, 편집 상태만 브라우저에 보관됩니다.
+            </p>
+            <div className="mb-4 flex flex-wrap items-end gap-2 border-b border-white/10 pb-4">
+              <label className="flex min-w-[12rem] flex-1 flex-col gap-0.5 text-[11px] text-white/60">
+                <span>프리셋 이름</span>
+                <input
+                  value={layoutPresetName}
+                  onChange={(e) => setLayoutPresetName(e.target.value)}
+                  placeholder="예: 시즌 레이드 최종안"
+                  className="rounded-lg border border-white/15 bg-black/40 px-2 py-1.5 text-sm text-white placeholder:text-white/35"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={handleSaveLayoutPreset}
+                className="rounded-lg border border-violet-500/40 bg-violet-600/30 px-3 py-2 text-xs font-semibold text-white hover:bg-violet-600/45"
+              >
+                현재 화면 전체 저장
+              </button>
+            </div>
+            {layoutPresets.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-white/15 bg-black/20 px-3 py-4 text-center text-xs text-white/45">
+                저장된 전체 배치가 없습니다. 캔버스를 맞춘 뒤 이름을 넣고 저장하세요.
+              </div>
+            ) : (
+              <ul className="flex flex-col gap-2">
+                {layoutPresets.map((p) => (
+                  <li
+                    key={p.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/30 px-3 py-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-white">{p.name}</div>
+                      <div
+                        className="truncate text-xs text-white/50"
+                        title={formatLayoutPreview(p)}
+                      >
+                        {formatLayoutPreview(p)}
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => applyLayoutPreset(p)}
+                        className="rounded-lg border border-violet-500/40 bg-violet-600/25 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-violet-600/40"
+                      >
+                        불러오기
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteLayoutPreset(p.id)}
+                        className="rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs text-white/70 hover:bg-red-500/20 hover:text-white"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
       </section>
 
       <section className="flex justify-center relative">
@@ -1509,72 +1568,6 @@ export default function Page() {
             </div>
           </div>
         </div>
-      </section>
-
-      <section className="mx-auto mt-12 w-full max-w-6xl rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/90 shadow-inner shadow-black/20">
-        <div className="mb-3 font-semibold text-white">택틱 조합 (전체 배치) 프리셋</div>
-        <p className="mb-3 text-xs text-white/55">
-          캔버스에 올려 둔 5슬롯(캐릭터·카드·장비), 펫 3칸, 오른쪽 노트까지 한 번에 저장·복원합니다. PNG
-          저장과 별개로, 편집 상태만 브라우저에 보관됩니다.
-        </p>
-        <div className="mb-4 flex flex-wrap items-end gap-2 border-b border-white/10 pb-4">
-          <label className="flex min-w-[12rem] flex-1 flex-col gap-0.5 text-[11px] text-white/60">
-            <span>프리셋 이름</span>
-            <input
-              value={layoutPresetName}
-              onChange={(e) => setLayoutPresetName(e.target.value)}
-              placeholder="예: 시즌 레이드 최종안"
-              className="rounded-lg border border-white/15 bg-black/40 px-2 py-1.5 text-sm text-white placeholder:text-white/35"
-            />
-          </label>
-          <button
-            type="button"
-            onClick={handleSaveLayoutPreset}
-            className="rounded-lg border border-violet-500/40 bg-violet-600/30 px-3 py-2 text-xs font-semibold text-white hover:bg-violet-600/45"
-          >
-            현재 화면 전체 저장
-          </button>
-        </div>
-        {layoutPresets.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-white/15 bg-black/20 px-3 py-4 text-center text-xs text-white/45">
-            저장된 전체 배치가 없습니다. 캔버스를 맞춘 뒤 이름을 넣고 저장하세요.
-          </div>
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {layoutPresets.map((p) => (
-              <li
-                key={p.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/30 px-3 py-2"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="font-medium text-white">{p.name}</div>
-                  <div
-                    className="truncate text-xs text-white/50"
-                    title={formatLayoutPreview(p)}
-                  >
-                    {formatLayoutPreview(p)}
-                  </div>
-                </div>
-                <div className="flex shrink-0 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => applyLayoutPreset(p)}
-                    className="rounded-lg border border-violet-500/40 bg-violet-600/25 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-violet-600/40"
-                  >
-                    불러오기
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteLayoutPreset(p.id)}
-                    className="rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs text-white/70 hover:bg-red-500/20 hover:text-white"
-                  >
-                    삭제
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
       </section>
 
       {/* 선택 모달 */}
