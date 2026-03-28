@@ -6,11 +6,24 @@ import chars from "@/data/chars.json";
 import equips from "@/data/equip.json";
 import pets from "@/data/pets.json";
 import type { ItemType } from "@/lib/store";
+import type { JobId } from "@/lib/jobs";
+import { weaponMatchesCharacterJob } from "@/lib/jobs";
 
 type LibraryItem = {
   id: string;
   name: string;
   src: string;
+  /** 계정당 1개만 장착 가능 — 다른 캐릭터/슬롯에 걸려 있으면 목록에서 제외 */
+  unique?: boolean;
+  /**
+   * 장비 선택 목록 정렬. 큰 값이 더 위(먼저)에 옵니다.
+   * 생략 시 `id`에 있는 숫자와 동일하게 취급(기존 동작).
+   */
+  sortOrder?: number;
+  /** 캐릭터 전용 — `knight` | `archer` | `mage` | `healer` (chars.json) */
+  job?: JobId;
+  /** 무기 전용 — 착용 가능 직업. 생략 시 전 직업 (equip.json, weapon 경로만 사용) */
+  jobs?: JobId[];
 };
 
 type EquipKind = "weapon" | "armor" | "helmet" | "roon";
@@ -27,6 +40,172 @@ type CharSlot = {
   };
 };
 
+/** 장비 4칸 조합 저장 (localStorage) */
+type EquipPreset = {
+  id: string;
+  name: string;
+  weaponId: string | null;
+  armorId: string | null;
+  helmetId: string | null;
+  roonId: string | null;
+};
+
+const PRESETS_STORAGE_KEY = "lostsword-equip-presets-v1";
+
+function loadEquipPresets(): EquipPreset[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(PRESETS_STORAGE_KEY);
+    if (!raw) return [];
+    const data = JSON.parse(raw) as unknown;
+    if (!Array.isArray(data)) return [];
+    return data.filter(
+      (x): x is EquipPreset =>
+        typeof x === "object" &&
+        x !== null &&
+        typeof (x as EquipPreset).id === "string" &&
+        typeof (x as EquipPreset).name === "string"
+    );
+  } catch {
+    return [];
+  }
+}
+
+function persistEquipPresets(presets: EquipPreset[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(presets));
+  } catch {
+    /* quota */
+  }
+}
+
+/** 5슬롯 캐릭터·카드·장비 + 펫 3 + 노트 (택틱 조합 전체) */
+type LayoutPreset = {
+  id: string;
+  name: string;
+  slots: Array<{
+    charId: string | null;
+    cardId: string | null;
+    weaponId: string | null;
+    armorId: string | null;
+    helmetId: string | null;
+    roonId: string | null;
+  }>;
+  petIds: [string | null, string | null, string | null];
+  note: string;
+};
+
+const LAYOUT_PRESETS_STORAGE_KEY = "lostsword-layout-presets-v1";
+
+function loadLayoutPresets(): LayoutPreset[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(LAYOUT_PRESETS_STORAGE_KEY);
+    if (!raw) return [];
+    const data = JSON.parse(raw) as unknown;
+    if (!Array.isArray(data)) return [];
+    return data.filter((x): x is LayoutPreset => {
+      if (typeof x !== "object" || x === null) return false;
+      const o = x as LayoutPreset;
+      return (
+        typeof o.id === "string" &&
+        typeof o.name === "string" &&
+        Array.isArray(o.slots) &&
+        Array.isArray(o.petIds) &&
+        o.petIds.length === 3 &&
+        typeof o.note === "string"
+      );
+    });
+  } catch {
+    return [];
+  }
+}
+
+function persistLayoutPresets(presets: LayoutPreset[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LAYOUT_PRESETS_STORAGE_KEY, JSON.stringify(presets));
+  } catch {
+    /* quota */
+  }
+}
+
+function findEquipById(id: string | null | undefined): LibraryItem | null {
+  if (!id) return null;
+  const e = equips.find((x) => x.id === id);
+  return e ? { ...(e as LibraryItem) } : null;
+}
+
+function findLibraryItemById(
+  list: readonly LibraryItem[],
+  id: string | null | undefined
+): LibraryItem | null {
+  if (!id) return null;
+  const x = list.find((i) => i.id === id);
+  return x ? { ...x } : null;
+}
+
+function formatPresetPreview(p: EquipPreset): string {
+  const names = [
+    findEquipById(p.weaponId)?.name,
+    findEquipById(p.armorId)?.name,
+    findEquipById(p.helmetId)?.name,
+    findEquipById(p.roonId)?.name
+  ].filter(Boolean) as string[];
+  if (names.length === 0) return "장비 없음";
+  return names.join(" · ");
+}
+
+function formatLayoutPreview(p: LayoutPreset): string {
+  const filled = p.slots.filter(
+    (s) =>
+      s.charId ||
+      s.cardId ||
+      s.weaponId ||
+      s.armorId ||
+      s.helmetId ||
+      s.roonId
+  ).length;
+  const petN = p.petIds.filter(Boolean).length;
+  const firstLine = p.note.trim().split("\n")[0]?.slice(0, 36) ?? "";
+  const noteHint = firstLine
+    ? `노트: ${firstLine}${p.note.trim().length > 36 ? "…" : ""}`
+    : "노트 없음";
+  return `슬롯 채움 ${filled}/5 · 펫 ${petN}/3 · ${noteHint}`;
+}
+
+const EQUIP_KINDS: EquipKind[] = ["weapon", "armor", "helmet", "roon"];
+
+/** 유니크 장비가 (현재 선택 칸이 아닌) 다른 곳에 장착 중이면 true */
+function isUniqueEquipBlockedElsewhere(
+  itemId: string,
+  currentSlotIndex: number,
+  currentKind: EquipKind,
+  slots: CharSlot[]
+): boolean {
+  for (let si = 0; si < slots.length; si++) {
+    for (const k of EQUIP_KINDS) {
+      const eq = slots[si].equips[k];
+      if (!eq || eq.id !== itemId) continue;
+      if (si === currentSlotIndex && k === currentKind) continue;
+      return true;
+    }
+  }
+  return false;
+}
+
+function idNumericSuffix(id: string): number {
+  return parseInt(id.match(/\d+/)?.[0] || "0", 10);
+}
+
+/** 장비 목록: sortOrder 우선, 없으면 id 숫자. 큰 값이 먼저. */
+function equipSortRank(item: LibraryItem): number {
+  if (typeof item.sortOrder === "number" && !Number.isNaN(item.sortOrder)) {
+    return item.sortOrder;
+  }
+  return idNumericSuffix(item.id);
+}
 
 function getLaneIconSrc(label: "후열" | "중열" | "전열"): string {
   if (label === "후열") return "/assets/lane-back.png";
@@ -170,12 +349,16 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
     
     // 높이 계산
     const padding = 16;
+    const slotPadding = 8;
     const slotWidth = (canvasWidth - padding * 2 - 16 * 4) / 5;
     const charImageHeight = Math.min(slotWidth * (4 / 3), 280);
     const cardImageHeight = Math.min(slotWidth * (8 / 5), 280);
-    const equipSize = 52;
-    const slotsHeight = charImageHeight + cardImageHeight + equipSize + 32;
-    const bottomSectionHeight = 180;
+    const equipGap = 6;
+    const equipTotalWidthForSlot = slotWidth - slotPadding * 2;
+    const equipCellSize = (equipTotalWidthForSlot - equipGap) / 2;
+    const equipBlockHeight = 6 + equipCellSize + equipGap + equipCellSize + 6;
+    const slotsHeight = charImageHeight + cardImageHeight + equipBlockHeight + 32;
+    const bottomSectionHeight = 140;
     
     const calculatedHeight = padding + slotsHeight + 12 + bottomSectionHeight + padding;
     const canvasHeight = targetHeight || calculatedHeight;
@@ -193,7 +376,6 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
     let y = padding;
 
     // 캐릭터 슬롯 그리기
-    const slotPadding = 8;
     for (let i = 0; i < 5; i++) {
       const slot = charSlots[i];
       const x = padding + i * (slotWidth + 16);
@@ -291,13 +473,11 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
 
       slotY += cardImageHeight + 12;
 
-      // 장비 슬롯
-      const equipGap = 6;
+      // 장비 슬롯 (2x2 — 무기/갑옷 상단, 투구/룬 하단)
       const equipTotalWidth = slotWidth - slotPadding * 2;
-      const equipItemWidth = (equipTotalWidth - equipGap * 3) / 4;
       
       ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-      roundRect(ctx, slotX, slotY, equipTotalWidth, equipSize + 12, 4);
+      roundRect(ctx, slotX, slotY, equipTotalWidth, equipBlockHeight, 4);
       ctx.fill();
       
       const equipKinds: EquipKind[] = ["weapon", "armor", "helmet", "roon"];
@@ -305,27 +485,30 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
       
       for (let j = 0; j < 4; j++) {
         const kind = equipKinds[j];
-        const equipX = slotX + j * (equipItemWidth + equipGap);
+        const col = j % 2;
+        const row = Math.floor(j / 2);
+        const equipX = slotX + 6 + col * (equipCellSize + equipGap);
+        const equipY = slotY + 6 + row * (equipCellSize + equipGap);
         const equip = slot.equips[kind];
         
         ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
         ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
         ctx.lineWidth = 1;
-        roundRect(ctx, equipX, slotY + 6, equipItemWidth, equipSize, 4);
+        roundRect(ctx, equipX, equipY, equipCellSize, equipCellSize, 4);
         ctx.fill();
         ctx.stroke();
         
         if (equip) {
           const equipImg = imageCache.get(equip.src);
           if (equipImg && equipImg.complete) {
-            ctx.drawImage(equipImg, equipX, slotY + 6, equipItemWidth, equipSize);
+            ctx.drawImage(equipImg, equipX, equipY, equipCellSize, equipCellSize);
           }
         } else {
           ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-          ctx.font = "400 10px 'Noto Sans KR', sans-serif";
+          ctx.font = "400 12px 'Noto Sans KR', sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText(equipLabels[kind], equipX + equipItemWidth / 2, slotY + 6 + equipSize / 2);
+          ctx.fillText(equipLabels[kind], equipX + equipCellSize / 2, equipY + equipCellSize / 2);
         }
       }
     }
@@ -346,24 +529,17 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
     ctx.stroke();
 
     const petBoxWidth = (petSectionWidth - 16 - 8) / 3;
-    const petBoxHeight = 144;
+    const petBoxHeight = 108;
     const petBoxY = bottomSectionY + 8;
 
-    const laneConfigs = [
-      { label: "후열", color: "rgba(14, 165, 233, 0.7)" },
-      { label: "중열", color: "rgba(245, 158, 11, 0.7)" },
-      { label: "전열", color: "rgba(244, 63, 94, 0.7)" }
-    ];
+    const laneLabels: ("후열" | "중열" | "전열")[] = ["후열", "중열", "전열"];
 
     for (let i = 0; i < 3; i++) {
-      const config = laneConfigs[i];
+      const label = laneLabels[i];
       const petX = padding + 8 + i * (petBoxWidth + 4);
       const pet = petFormationSlots[i];
 
-      const gradient = ctx.createLinearGradient(petX, petBoxY, petX + petBoxWidth, petBoxY + petBoxHeight);
-      gradient.addColorStop(0, config.color);
-      gradient.addColorStop(1, config.color);
-      ctx.fillStyle = gradient;
+      ctx.fillStyle = "rgba(0, 0, 0, 0.92)";
       roundRect(ctx, petX, petBoxY, petBoxWidth, petBoxHeight, 4);
       ctx.fill();
 
@@ -377,12 +553,12 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
       ctx.fillStyle = "#ffffff";
       ctx.font = "600 12px 'Noto Sans KR', sans-serif";
       
-      const textMetrics = ctx.measureText(config.label);
+      const textMetrics = ctx.measureText(label);
       const totalWidth = iconSize + iconSpacing + textMetrics.width;
       const startX = petX + (petBoxWidth - totalWidth) / 2;
       const labelY = petBoxY + 8 + iconSize / 2; // 아이콘 중앙 높이
       
-      const iconImg = imageCache.get(getLaneIconSrc(config.label as "후열" | "중열" | "전열"));
+      const iconImg = imageCache.get(getLaneIconSrc(label));
       if (iconImg && iconImg.complete) {
         ctx.drawImage(iconImg, startX, petBoxY + 8, iconSize, iconSize);
       }
@@ -390,11 +566,11 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
       // 텍스트를 아이콘 중앙 높이에 맞춰서 표시
       ctx.textAlign = "left";
       ctx.textBaseline = "middle";
-      ctx.fillText(config.label, startX + iconSize + iconSpacing, labelY);
+      ctx.fillText(label, startX + iconSize + iconSpacing, labelY);
 
-      const petImageSize = 80;
+      const petImageSize = 62;
       const petImageX = petX + (petBoxWidth - petImageSize) / 2;
-      const petImageY = petBoxY + 36;
+      const petImageY = petBoxY + 30;
 
       if (pet) {
         const petImg = imageCache.get(pet.src);
@@ -422,9 +598,9 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
     const noteX = padding + petSectionWidth + 12;
     const noteSectionWidth = (canvasWidth - padding * 2 - 12) * 0.4;
     const notePadding = 12;
-    const noteStartY = bottomSectionY + 40;
+    const noteStartY = bottomSectionY + notePadding;
     const noteAreaWidth = noteSectionWidth - notePadding * 2;
-    const noteAreaHeight = bottomSectionHeight - 40 - notePadding;
+    const noteAreaHeight = bottomSectionHeight - notePadding * 2;
     
     // 노트 영역 배경 그리기
     ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
@@ -433,13 +609,6 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
     roundRect(ctx, noteX, bottomSectionY, noteSectionWidth, bottomSectionHeight, 4);
     ctx.fill();
     ctx.stroke();
-
-    // 제목 그리기
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "600 14px 'Noto Sans KR', sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("노트", noteX + noteSectionWidth / 2, bottomSectionY + 20);
 
     // 노트 텍스트 영역 클리어 (이전 텍스트 제거)
     ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
@@ -548,7 +717,13 @@ export default function Page() {
   } | null>(null);
   const [isComposing, setIsComposing] = useState(false);
   const [noteText, setNoteText] = useState("");
-  
+  const [equipPresets, setEquipPresets] = useState<EquipPreset[]>([]);
+  const [presetSaveSlotIndex, setPresetSaveSlotIndex] = useState(0);
+  const [presetSaveName, setPresetSaveName] = useState("");
+  const [presetApplySlotIndex, setPresetApplySlotIndex] = useState(0);
+  const [layoutPresets, setLayoutPresets] = useState<LayoutPreset[]>([]);
+  const [layoutPresetName, setLayoutPresetName] = useState("");
+
   const initialCharSlots = useMemo(
     () =>
       Array.from({ length: 5 }, (_, idx) => ({
@@ -571,22 +746,186 @@ export default function Page() {
   
   const libraries = useMemo<Record<ItemType, LibraryItem[]>>(
     () => ({
-      card: cards,
-      char: chars,
-      pet: pets,
-      equip: equips
+      card: cards as LibraryItem[],
+      char: chars as LibraryItem[],
+      pet: pets as LibraryItem[],
+      equip: equips as LibraryItem[]
     }),
     []
   );
 
   const equipWithType = useMemo(
     () =>
-      equips.map((eq) => ({
+      (equips as LibraryItem[]).map((eq) => ({
         ...eq,
         kind: getEquipKind(eq.src)
       })),
     []
   );
+
+  const uniqueEquipIds = useMemo(() => {
+    const s = new Set<string>();
+    for (const e of equips) {
+      const u = e as LibraryItem;
+      if (u.unique) s.add(u.id);
+    }
+    return s;
+  }, []);
+
+  useEffect(() => {
+    setEquipPresets(loadEquipPresets());
+    setLayoutPresets(loadLayoutPresets());
+  }, []);
+
+  const applyEquipPreset = useCallback(
+    (preset: EquipPreset, targetSlotIndex: number) => {
+      const newEquips: CharSlot["equips"] = {
+        weapon: findEquipById(preset.weaponId),
+        armor: findEquipById(preset.armorId),
+        helmet: findEquipById(preset.helmetId),
+        roon: findEquipById(preset.roonId)
+      };
+
+      const claimedUniqueIds = new Set<string>();
+      for (const k of EQUIP_KINDS) {
+        const eq = newEquips[k];
+        if (eq && uniqueEquipIds.has(eq.id)) claimedUniqueIds.add(eq.id);
+      }
+
+      setCharSlots((prev) => {
+        const next = prev.map((s) => ({ ...s, equips: { ...s.equips } }));
+
+        for (let si = 0; si < next.length; si++) {
+          if (si === targetSlotIndex) continue;
+          for (const k of EQUIP_KINDS) {
+            const eq = next[si].equips[k];
+            if (eq && claimedUniqueIds.has(eq.id)) {
+              next[si].equips[k] = null;
+            }
+          }
+        }
+
+        next[targetSlotIndex] = {
+          ...next[targetSlotIndex],
+          equips: newEquips
+        };
+        return next;
+      });
+    },
+    [uniqueEquipIds]
+  );
+
+  const handleSaveEquipPreset = () => {
+    const name = presetSaveName.trim();
+    if (!name) return;
+    const slot = charSlots[presetSaveSlotIndex];
+    const newPreset: EquipPreset = {
+      id:
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `preset-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      name,
+      weaponId: slot.equips.weapon?.id ?? null,
+      armorId: slot.equips.armor?.id ?? null,
+      helmetId: slot.equips.helmet?.id ?? null,
+      roonId: slot.equips.roon?.id ?? null
+    };
+    setEquipPresets((prev) => {
+      const next = [...prev, newPreset];
+      persistEquipPresets(next);
+      return next;
+    });
+    setPresetSaveName("");
+  };
+
+  const handleDeleteEquipPreset = (id: string) => {
+    setEquipPresets((prev) => {
+      const next = prev.filter((p) => p.id !== id);
+      persistEquipPresets(next);
+      return next;
+    });
+  };
+
+  const applyLayoutPreset = useCallback((preset: LayoutPreset) => {
+    const libChars = chars as LibraryItem[];
+    const libCards = cards as LibraryItem[];
+    const libPets = pets as LibraryItem[];
+
+    const rawSlots = [...preset.slots];
+    while (rawSlots.length < 5) {
+      rawSlots.push({
+        charId: null,
+        cardId: null,
+        weaponId: null,
+        armorId: null,
+        helmetId: null,
+        roonId: null
+      });
+    }
+    if (rawSlots.length > 5) rawSlots.length = 5;
+
+    const nextSlots: CharSlot[] = rawSlots.map((s, idx) => ({
+      id: `slot-${idx + 1}`,
+      char: findLibraryItemById(libChars, s.charId),
+      card: findLibraryItemById(libCards, s.cardId),
+      equips: {
+        weapon: findEquipById(s.weaponId),
+        armor: findEquipById(s.armorId),
+        helmet: findEquipById(s.helmetId),
+        roon: findEquipById(s.roonId)
+      }
+    }));
+
+    setCharSlots(nextSlots);
+    setPetFormationSlots([
+      findLibraryItemById(libPets, preset.petIds[0]),
+      findLibraryItemById(libPets, preset.petIds[1]),
+      findLibraryItemById(libPets, preset.petIds[2])
+    ]);
+    setNoteText(preset.note);
+  }, []);
+
+  const handleSaveLayoutPreset = () => {
+    const name = layoutPresetName.trim();
+    if (!name) return;
+    const slots = charSlots.map((slot) => ({
+      charId: slot.char?.id ?? null,
+      cardId: slot.card?.id ?? null,
+      weaponId: slot.equips.weapon?.id ?? null,
+      armorId: slot.equips.armor?.id ?? null,
+      helmetId: slot.equips.helmet?.id ?? null,
+      roonId: slot.equips.roon?.id ?? null
+    }));
+    const petIds: [string | null, string | null, string | null] = [
+      petFormationSlots[0]?.id ?? null,
+      petFormationSlots[1]?.id ?? null,
+      petFormationSlots[2]?.id ?? null
+    ];
+    const newPreset: LayoutPreset = {
+      id:
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `layout-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      name,
+      slots,
+      petIds,
+      note: noteText
+    };
+    setLayoutPresets((prev) => {
+      const next = [...prev, newPreset];
+      persistLayoutPresets(next);
+      return next;
+    });
+    setLayoutPresetName("");
+  };
+
+  const handleDeleteLayoutPreset = (id: string) => {
+    setLayoutPresets((prev) => {
+      const next = prev.filter((p) => p.id !== id);
+      persistLayoutPresets(next);
+      return next;
+    });
+  };
 
   const handleCompositionEnd = (
     e: React.CompositionEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -641,17 +980,35 @@ export default function Page() {
         return next;
       });
     } else if (slotTarget.type === "equip" && slotTarget.equipKind) {
-      setCharSlots((prev) => {
-        const next = [...prev];
-        next[slotTarget.slotIndex] = {
-          ...next[slotTarget.slotIndex],
-          equips: {
-            ...next[slotTarget.slotIndex].equips,
-            [slotTarget.equipKind as EquipKind]: item
+      const kind = slotTarget.equipKind as EquipKind;
+      const slotIdx = slotTarget.slotIndex;
+      if (kind === "weapon") {
+        const charJob = charSlots[slotIdx].char?.job;
+        if (!weaponMatchesCharacterJob(item, charJob ?? null)) {
+          return;
+        }
+      }
+      const isUnique = uniqueEquipIds.has(item.id);
+      setCharSlots((prev) =>
+        prev.map((slot, idx) => {
+          if (idx === slotIdx) {
+            return {
+              ...slot,
+              equips: { ...slot.equips, [kind]: item }
+            };
           }
-        };
-        return next;
-      });
+          if (!isUnique) return slot;
+          const equips = { ...slot.equips };
+          let changed = false;
+          for (const k of EQUIP_KINDS) {
+            if (equips[k]?.id === item.id) {
+              equips[k] = null;
+              changed = true;
+            }
+          }
+          return changed ? { ...slot, equips } : slot;
+        })
+      );
     }
     setSlotTarget(null);
     setPicker(null);
@@ -688,8 +1045,21 @@ export default function Page() {
 
     let list: LibraryItem[] = [];
     if (slotTarget.type === "equip" && slotTarget.equipKind) {
+      const pickKind = slotTarget.equipKind;
+      const pickSlot = slotTarget.slotIndex;
+      const charJobForWeapon = charSlots[pickSlot].char?.job;
       list = equipWithType
-        .filter((eq) => eq.kind === slotTarget.equipKind || eq.kind === "other")
+        .filter((eq) => eq.kind === pickKind || eq.kind === "other")
+        .filter((eq) => {
+          if (pickKind === "weapon" && (eq.kind === "weapon" || eq.kind === "other")) {
+            return weaponMatchesCharacterJob(eq as LibraryItem, charJobForWeapon ?? null);
+          }
+          return true;
+        })
+        .filter((eq) => {
+          if (!uniqueEquipIds.has(eq.id)) return true;
+          return !isUniqueEquipBlockedElsewhere(eq.id, pickSlot, pickKind, charSlots);
+        })
         .map(({ kind: _, ...rest }) => rest);
     } else {
       list = filterAvailable(libraries[picker], picker);
@@ -698,14 +1068,14 @@ export default function Page() {
     const filtered = query
       ? list.filter((item) => item.name.toLowerCase().includes(query))
       : list;
-    
-    const sorted = [...filtered].sort((a, b) => {
-      const numA = parseInt(a.id.match(/\d+/)?.[0] || "0");
-      const numB = parseInt(b.id.match(/\d+/)?.[0] || "0");
-      return numB - numA;
-    });
-    
+
     const isEquip = slotTarget.type === "equip";
+    const sorted = [...filtered].sort((a, b) => {
+      if (isEquip) {
+        return equipSortRank(b) - equipSortRank(a);
+      }
+      return idNumericSuffix(b.id) - idNumericSuffix(a.id);
+    });
     return (
       <div
         className={
@@ -742,8 +1112,15 @@ export default function Page() {
                 </div>
                 <div className="flex flex-1 items-center justify-between gap-2 text-sm font-semibold text-white">
                   <span className="truncate">{entry.name}</span>
-                  <span className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] uppercase tracking-wide">
-                    EQUIP
+                  <span className="flex shrink-0 items-center gap-1">
+                    {uniqueEquipIds.has(entry.id) && (
+                      <span className="rounded-full bg-amber-500/35 px-2 py-0.5 text-[10px] font-medium text-amber-100">
+                        유니크
+                      </span>
+                    )}
+                    <span className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+                      EQUIP
+                    </span>
                   </span>
                 </div>
               </>
@@ -793,21 +1170,28 @@ export default function Page() {
   const canvasLayout = useMemo(() => {
     const width = 1280;
     const padding = 16;
+    const slotPadding = 8;
     const slotWidth = (width - padding * 2 - 16 * 4) / 5; // gap 16px * 4
     const charImageHeight = Math.min(slotWidth * (4 / 3), 280);
     const cardImageHeight = Math.min(slotWidth * (8 / 5), 280);
-    const equipSize = 52;
-    const slotPadding = 8;
+    const equipGap = 6;
+    const equipTotalWidth = slotWidth - slotPadding * 2;
+    const equipCellSize = (equipTotalWidth - equipGap) / 2;
+    const equipBlockHeight = 6 + equipCellSize + equipGap + equipCellSize + 6;
     const gap = 16;
+    const bottomSectionHeight = 140;
     
     return {
       padding,
       slotWidth,
       charImageHeight,
       cardImageHeight,
-      equipSize,
+      equipCellSize,
+      equipBlockHeight,
+      equipGap,
       slotPadding,
-      gap
+      gap,
+      bottomSectionHeight
     };
   }, []);
 
@@ -838,6 +1222,109 @@ export default function Page() {
           </div>
         </div>
       </header>
+
+      <section className="mx-auto w-full max-w-6xl rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/90 shadow-inner shadow-black/20">
+        <div className="mb-3 font-semibold text-white">장비 프리셋</div>
+        <p className="mb-3 text-xs text-white/55">
+          자주 쓰는 무기·갑옷·투구·룬 조합을 저장해 두었다가 슬롯에 한 번에 적용할 수 있습니다. 브라우저에 저장됩니다.
+        </p>
+        <div className="mb-4 flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:flex-wrap sm:items-end">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs text-white/50">저장</span>
+            <span className="text-[11px] text-white/60">가져올 슬롯</span>
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label="저장할 장비를 가져올 캐릭터 슬롯">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <button
+                  key={`preset-save-slot-${i}`}
+                  type="button"
+                  onClick={() => setPresetSaveSlotIndex(i)}
+                  className={`flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-semibold transition ${
+                    presetSaveSlotIndex === i
+                      ? "border-emerald-400/80 bg-emerald-600/45 text-white shadow-[inset_0_0_0_1px_rgba(52,211,153,0.45)]"
+                      : "border-white/15 bg-black/40 text-white/75 hover:border-white/30 hover:bg-white/10"
+                  }`}
+                  aria-pressed={presetSaveSlotIndex === i}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+          <label className="flex min-w-[10rem] flex-1 flex-col gap-0.5 text-[11px] text-white/60">
+            <span>프리셋 이름</span>
+            <input
+              value={presetSaveName}
+              onChange={(e) => setPresetSaveName(e.target.value)}
+              placeholder="예: 주력 딜 세트"
+              className="rounded-lg border border-white/15 bg-black/40 px-2 py-1.5 text-sm text-white placeholder:text-white/35"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={handleSaveEquipPreset}
+            className="rounded-lg border border-emerald-500/40 bg-emerald-600/30 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-600/45 sm:shrink-0"
+          >
+            현재 장비로 저장
+          </button>
+        </div>
+        <div className="mb-3 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+          <span className="text-xs text-white/50">적용할 캐릭터 슬롯</span>
+          <div className="flex flex-wrap gap-1.5" role="group" aria-label="프리셋을 넣을 캐릭터 슬롯">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <button
+                key={`preset-apply-slot-${i}`}
+                type="button"
+                onClick={() => setPresetApplySlotIndex(i)}
+                className={`flex h-9 w-9 items-center justify-center rounded-lg border text-sm font-semibold transition ${
+                  presetApplySlotIndex === i
+                    ? "border-sky-400/80 bg-sky-600/45 text-white shadow-[inset_0_0_0_1px_rgba(56,189,248,0.45)]"
+                    : "border-white/15 bg-black/40 text-white/75 hover:border-white/30 hover:bg-white/10"
+                }`}
+                aria-pressed={presetApplySlotIndex === i}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        </div>
+        {equipPresets.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-white/15 bg-black/20 px-3 py-4 text-center text-xs text-white/45">
+            저장된 프리셋이 없습니다. 위에서 슬롯을 고르고 이름을 입력한 뒤 저장하세요.
+          </div>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {equipPresets.map((p) => (
+              <li
+                key={p.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/30 px-3 py-2"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium text-white">{p.name}</div>
+                  <div className="truncate text-xs text-white/50" title={formatPresetPreview(p)}>
+                    {formatPresetPreview(p)}
+                  </div>
+                </div>
+                <div className="flex shrink-0 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => applyEquipPreset(p, presetApplySlotIndex)}
+                    className="rounded-lg border border-sky-500/40 bg-sky-600/25 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-sky-600/40"
+                  >
+                    적용
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteEquipPreset(p.id)}
+                    className="rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs text-white/70 hover:bg-red-500/20 hover:text-white"
+                  >
+                    삭제
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section className="flex justify-center relative">
         <div
@@ -879,7 +1366,7 @@ export default function Page() {
                         className="relative"
                         style={{
                           width: `${canvasLayout.slotWidth}px`,
-                          height: `${canvasLayout.charImageHeight + canvasLayout.cardImageHeight + canvasLayout.equipSize + 32}px`
+                          height: `${canvasLayout.charImageHeight + canvasLayout.cardImageHeight + canvasLayout.equipBlockHeight + 32}px`
                         }}
                       >
                         {/* 캐릭터 버튼 */}
@@ -912,13 +1399,17 @@ export default function Page() {
                         />
                         {/* 장비 버튼들 */}
                         {(["weapon", "armor", "helmet", "roon"] as EquipKind[]).map((kind, equipIdx) => {
-                          const equipGap = 6;
-                          const equipTotalWidth = canvasLayout.slotWidth - canvasLayout.slotPadding * 2;
-                          const equipItemWidth = (equipTotalWidth - equipGap * 3) / 4;
-                          const slotX = canvasLayout.slotPadding;
-                          const slotY = canvasLayout.slotPadding + canvasLayout.charImageHeight + 12 + canvasLayout.cardImageHeight + 12;
-                          const equipX = slotX + equipIdx * (equipItemWidth + equipGap);
-                          const equipY = slotY + 6;
+                          const col = equipIdx % 2;
+                          const row = Math.floor(equipIdx / 2);
+                          const baseY =
+                            canvasLayout.slotPadding +
+                            canvasLayout.charImageHeight +
+                            12 +
+                            canvasLayout.cardImageHeight +
+                            12;
+                          const equipX =
+                            canvasLayout.slotPadding + 6 + col * (canvasLayout.equipCellSize + canvasLayout.equipGap);
+                          const equipY = baseY + 6 + row * (canvasLayout.equipCellSize + canvasLayout.equipGap);
                           
                           return (
                             <button
@@ -931,8 +1422,8 @@ export default function Page() {
                               style={{
                                 left: `${equipX}px`,
                                 top: `${equipY}px`,
-                                width: `${equipItemWidth}px`,
-                                height: `${canvasLayout.equipSize}px`
+                                width: `${canvasLayout.equipCellSize}px`,
+                                height: `${canvasLayout.equipCellSize}px`
                               }}
                             />
                           );
@@ -946,7 +1437,10 @@ export default function Page() {
               {/* 펫 진형 및 노트 오버레이 */}
               <div className="flex-shrink-0 flex" style={{ gap: "12px", marginTop: "12px" }}>
                 {/* 펫 진형 */}
-                <div className="relative" style={{ width: "60%", height: "180px" }}>
+                <div
+                  className="relative"
+                  style={{ width: "60%", height: `${canvasLayout.bottomSectionHeight}px` }}
+                >
                   {(["후열", "중열", "전열"] as const).map((label, idx) => {
                     const petSectionWidth = (1280 - canvasLayout.padding * 2 - 12) * 0.6;
                     const petBoxWidth = (petSectionWidth - 16 - 8) / 3;
@@ -967,25 +1461,26 @@ export default function Page() {
                           left: `${petX}px`,
                           top: "8px",
                           width: `${petBoxWidth}px`,
-                          height: "144px"
+                          height: "108px"
                         }}
                       />
                     );
                   })}
                 </div>
                 {/* 노트 */}
-                <div className="relative" style={{ width: "40%", height: "180px" }}>
-                  {/* 제목 영역 - 캔버스에서 bottomSectionY + 20 (중앙)에 그려짐 */}
-                  <div className="absolute top-0 left-0 right-0 pointer-events-none flex items-center justify-center" style={{ height: "40px" }}>
-                    {/* 제목은 캔버스에서만 표시되므로 오버레이에서는 숨김 */}
-                  </div>
-                  {/* 텍스트 영역 - 캔버스에서 noteX + notePadding, noteStartY부터 시작 */}
-                  <div className="absolute overflow-hidden" style={{ 
-                    top: "40px", 
-                    left: "12px", 
-                    right: "12px", 
-                    bottom: "12px"
-                  }}>
+                <div
+                  className="relative"
+                  style={{ width: "40%", height: `${canvasLayout.bottomSectionHeight}px` }}
+                >
+                  <div
+                    className="absolute overflow-hidden"
+                    style={{
+                      top: "12px",
+                      left: "12px",
+                      right: "12px",
+                      bottom: "12px"
+                    }}
+                  >
                     <textarea
                       value={noteText}
                       onChange={(e) => setNoteText(e.target.value)}
@@ -1014,6 +1509,72 @@ export default function Page() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="mx-auto mt-12 w-full max-w-6xl rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/90 shadow-inner shadow-black/20">
+        <div className="mb-3 font-semibold text-white">택틱 조합 (전체 배치) 프리셋</div>
+        <p className="mb-3 text-xs text-white/55">
+          캔버스에 올려 둔 5슬롯(캐릭터·카드·장비), 펫 3칸, 오른쪽 노트까지 한 번에 저장·복원합니다. PNG
+          저장과 별개로, 편집 상태만 브라우저에 보관됩니다.
+        </p>
+        <div className="mb-4 flex flex-wrap items-end gap-2 border-b border-white/10 pb-4">
+          <label className="flex min-w-[12rem] flex-1 flex-col gap-0.5 text-[11px] text-white/60">
+            <span>프리셋 이름</span>
+            <input
+              value={layoutPresetName}
+              onChange={(e) => setLayoutPresetName(e.target.value)}
+              placeholder="예: 시즌 레이드 최종안"
+              className="rounded-lg border border-white/15 bg-black/40 px-2 py-1.5 text-sm text-white placeholder:text-white/35"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={handleSaveLayoutPreset}
+            className="rounded-lg border border-violet-500/40 bg-violet-600/30 px-3 py-2 text-xs font-semibold text-white hover:bg-violet-600/45"
+          >
+            현재 화면 전체 저장
+          </button>
+        </div>
+        {layoutPresets.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-white/15 bg-black/20 px-3 py-4 text-center text-xs text-white/45">
+            저장된 전체 배치가 없습니다. 캔버스를 맞춘 뒤 이름을 넣고 저장하세요.
+          </div>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {layoutPresets.map((p) => (
+              <li
+                key={p.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/30 px-3 py-2"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium text-white">{p.name}</div>
+                  <div
+                    className="truncate text-xs text-white/50"
+                    title={formatLayoutPreview(p)}
+                  >
+                    {formatLayoutPreview(p)}
+                  </div>
+                </div>
+                <div className="flex shrink-0 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => applyLayoutPreset(p)}
+                    className="rounded-lg border border-violet-500/40 bg-violet-600/25 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-violet-600/40"
+                  >
+                    불러오기
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteLayoutPreset(p.id)}
+                    className="rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs text-white/70 hover:bg-red-500/20 hover:text-white"
+                  >
+                    삭제
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       {/* 선택 모달 */}
@@ -1072,7 +1633,15 @@ export default function Page() {
                     });
                   const sourceList =
                     picker === "equip"
-                      ? libraries.equip
+                      ? libraries.equip.filter((item) => {
+                          if (!uniqueEquipIds.has(item.id)) return true;
+                          for (const slot of charSlots) {
+                            for (const k of EQUIP_KINDS) {
+                              if (slot.equips[k]?.id === item.id) return false;
+                            }
+                          }
+                          return true;
+                        })
                       : filterAvailable(libraries[picker], picker);
                   const query = search.trim().toLowerCase();
                   const filtered = query
@@ -1081,9 +1650,10 @@ export default function Page() {
                       )
                     : sourceList;
                   const sorted = [...filtered].sort((a, b) => {
-                    const numA = parseInt(a.id.match(/\d+/)?.[0] || "0");
-                    const numB = parseInt(b.id.match(/\d+/)?.[0] || "0");
-                    return numB - numA;
+                    if (picker === "equip") {
+                      return equipSortRank(b) - equipSortRank(a);
+                    }
+                    return idNumericSuffix(b.id) - idNumericSuffix(a.id);
                   });
                   return (
                     <div className={picker === "equip" ? "grid grid-cols-2 gap-3" : "flex flex-col gap-2"}>
@@ -1111,10 +1681,17 @@ export default function Page() {
                                 alt={entry.name}
                                 className="h-full w-full object-cover"
                               />
-                              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/80 via-black/40 to-transparent px-2 py-1 text-[11px] font-medium text-white">
+                              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-2 py-1 text-[11px] font-medium text-white">
                                 <span className="truncate">{entry.name}</span>
-                                <span className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] uppercase tracking-wide">
-                                  EQUIP
+                                <span className="flex shrink-0 items-center gap-1">
+                                  {uniqueEquipIds.has(entry.id) && (
+                                    <span className="rounded-full bg-amber-500/35 px-2 py-0.5 text-[10px] font-medium text-amber-100">
+                                      유니크
+                                    </span>
+                                  )}
+                                  <span className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+                                    EQUIP
+                                  </span>
                                 </span>
                               </div>
                             </>
