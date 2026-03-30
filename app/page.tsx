@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import cards from "@/data/cards.json";
@@ -199,12 +199,16 @@ function idNumericSuffix(id: string): number {
   return parseInt(id.match(/\d+/)?.[0] || "0", 10);
 }
 
-/** 장비 목록: sortOrder 우선, 없으면 id 숫자. 큰 값이 먼저. */
-function equipSortRank(item: LibraryItem): number {
+function listSortRank(item: LibraryItem): number {
   if (typeof item.sortOrder === "number" && !Number.isNaN(item.sortOrder)) {
     return item.sortOrder;
   }
   return idNumericSuffix(item.id);
+}
+
+/** 장비 목록: sortOrder 우선, 없으면 id 숫자. 큰 값이 먼저. */
+function equipSortRank(item: LibraryItem): number {
+  return listSortRank(item);
 }
 
 function getLaneIconSrc(label: "후열" | "중열" | "전열"): string {
@@ -358,7 +362,7 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
     const equipCellSize = (equipTotalWidthForSlot - equipGap) / 2;
     const equipBlockHeight = 6 + equipCellSize + equipGap + equipCellSize + 6;
     const slotsHeight = charImageHeight + cardImageHeight + equipBlockHeight + 32;
-    const bottomSectionHeight = 140;
+    const bottomSectionHeight = 180;
     
     const calculatedHeight = padding + slotsHeight + 12 + bottomSectionHeight + padding;
     const canvasHeight = targetHeight || calculatedHeight;
@@ -529,7 +533,7 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
     ctx.stroke();
 
     const petBoxWidth = (petSectionWidth - 16 - 8) / 3;
-    const petBoxHeight = 108;
+    const petBoxHeight = 144;
     const petBoxY = bottomSectionY + 8;
 
     const laneLabels: ("후열" | "중열" | "전열")[] = ["후열", "중열", "전열"];
@@ -568,9 +572,9 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
       ctx.textBaseline = "middle";
       ctx.fillText(label, startX + iconSize + iconSpacing, labelY);
 
-      const petImageSize = 62;
+      const petImageSize = 80;
       const petImageX = petX + (petBoxWidth - petImageSize) / 2;
-      const petImageY = petBoxY + 30;
+      const petImageY = petBoxY + 36;
 
       if (pet) {
         const petImg = imageCache.get(pet.src);
@@ -1074,7 +1078,7 @@ export default function Page() {
       if (isEquip) {
         return equipSortRank(b) - equipSortRank(a);
       }
-      return idNumericSuffix(b.id) - idNumericSuffix(a.id);
+      return listSortRank(b) - listSortRank(a);
     });
     return (
       <div
@@ -1179,7 +1183,7 @@ export default function Page() {
     const equipCellSize = (equipTotalWidth - equipGap) / 2;
     const equipBlockHeight = 6 + equipCellSize + equipGap + equipCellSize + 6;
     const gap = 16;
-    const bottomSectionHeight = 140;
+    const bottomSectionHeight = 180;
     
     return {
       padding,
@@ -1520,7 +1524,7 @@ export default function Page() {
                           left: `${petX}px`,
                           top: "8px",
                           width: `${petBoxWidth}px`,
-                          height: "108px"
+                          height: "144px"
                         }}
                       />
                     );
@@ -1646,7 +1650,7 @@ export default function Page() {
                     if (picker === "equip") {
                       return equipSortRank(b) - equipSortRank(a);
                     }
-                    return idNumericSuffix(b.id) - idNumericSuffix(a.id);
+                    return listSortRank(b) - listSortRank(a);
                   });
                   return (
                     <div className={picker === "equip" ? "grid grid-cols-2 gap-3" : "flex flex-col gap-2"}>
@@ -1725,3 +1729,5 @@ export default function Page() {
     </main>
   );
 }
+
+

@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "LostSword Editor",
-  description: "Compose cards, characters, and pets onto a canvas."
+  description: "로스트소드 카드 및 장비 배치"
 };
 
 export default function RootLayout({

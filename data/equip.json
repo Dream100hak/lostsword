@@ -168,7 +168,7 @@
         "id":  "equip-28",
         "name":  "여신의지팡이",
         "src":  "/assets/equip/weapon/여신의지팡이.png",
-        "jobs": ["mage"]
+        "jobs": ["mage", "healer"]
     },
     {
         "id":  "equip-29",
@@ -186,7 +186,7 @@
         "id":  "equip-31",
         "name":  "인피니티스태프",
         "src":  "/assets/equip/weapon/인피니티스태프.png",
-        "jobs": ["mage"],
+        "jobs": ["mage" , "healer"],
         "unique": true, 
         "sortOrder": 1000
     },

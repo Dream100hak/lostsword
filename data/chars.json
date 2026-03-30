@@ -262,5 +262,12 @@
         "name":  "유미",
         "src":  "/assets/chars/유미.png",
         "job": "mage"
+    },
+    {
+        "id":  "char-48",
+        "name":  "니무에",
+        "src":  "/assets/chars/니무에.png",
+        "job": "mage",
+        "sortOrder": -999
     }
 ]
