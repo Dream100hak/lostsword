@@ -118,7 +118,7 @@
         "id":  "equip-21",
         "name":  "감반테인",
         "src":  "/assets/equip/weapon/감반테인.png",
-        "jobs": ["mage"]
+        "jobs": ["mage" , "healer"]
 
     },
     {
@@ -290,7 +290,7 @@
         "id":  "equip-48",
         "name":  "야성의스태프",
         "src":  "/assets/equip/weapon/야성의스태프.png",
-        "jobs": ["mage"]
+        "jobs": ["mage" , "healer"]
     },
     {
         "id":  "equip-49",

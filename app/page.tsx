@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import cards from "@/data/cards.json";
@@ -362,7 +362,7 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
     const equipCellSize = (equipTotalWidthForSlot - equipGap) / 2;
     const equipBlockHeight = 6 + equipCellSize + equipGap + equipCellSize + 6;
     const slotsHeight = charImageHeight + cardImageHeight + equipBlockHeight + 32;
-    const bottomSectionHeight = 180;
+    const bottomSectionHeight = 220;
     
     const calculatedHeight = padding + slotsHeight + 12 + bottomSectionHeight + padding;
     const canvasHeight = targetHeight || calculatedHeight;
@@ -533,8 +533,9 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
     ctx.stroke();
 
     const petBoxWidth = (petSectionWidth - 16 - 8) / 3;
-    const petBoxHeight = 144;
-    const petBoxY = bottomSectionY + 8;
+    const petVerticalInset = 4;
+    const petBoxY = bottomSectionY + petVerticalInset;
+    const petBoxHeight = bottomSectionHeight - petVerticalInset * 2;
 
     const laneLabels: ("후열" | "중열" | "전열")[] = ["후열", "중열", "전열"];
 
@@ -551,30 +552,39 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
       ctx.lineWidth = 1;
       ctx.strokeRect(petX, petBoxY, petBoxWidth, petBoxHeight);
 
-      // 아이콘과 텍스트를 중앙에 배치
-      const iconSize = 16;
-      const iconSpacing = 8; // 간격 증가
+      // 얇은 라벨 줄 — 아래 펫 이미지가 칸을 최대한 채우도록
+      const labelPadTop = 3;
+      const iconSize = 13;
+      const iconSpacing = 5;
       ctx.fillStyle = "#ffffff";
-      ctx.font = "600 12px 'Noto Sans KR', sans-serif";
+      ctx.font = "600 11px 'Noto Sans KR', sans-serif";
       
       const textMetrics = ctx.measureText(label);
       const totalWidth = iconSize + iconSpacing + textMetrics.width;
       const startX = petX + (petBoxWidth - totalWidth) / 2;
-      const labelY = petBoxY + 8 + iconSize / 2; // 아이콘 중앙 높이
+      const labelY = petBoxY + labelPadTop + iconSize / 2;
       
       const iconImg = imageCache.get(getLaneIconSrc(label));
       if (iconImg && iconImg.complete) {
-        ctx.drawImage(iconImg, startX, petBoxY + 8, iconSize, iconSize);
+        ctx.drawImage(iconImg, startX, petBoxY + labelPadTop, iconSize, iconSize);
       }
       
-      // 텍스트를 아이콘 중앙 높이에 맞춰서 표시
       ctx.textAlign = "left";
       ctx.textBaseline = "middle";
       ctx.fillText(label, startX + iconSize + iconSpacing, labelY);
 
-      const petImageSize = 80;
+      const labelRowBottom = labelPadTop + iconSize + 2;
+      const imageSidePad = 4;
+      const imageBottomPad = 4;
+      const availW = petBoxWidth - imageSidePad * 2;
+      const availH = petBoxHeight - labelRowBottom - imageBottomPad;
+      // 펫 칸 안에서 가능한 한 큰 정사각형(위 장비 칸보다 커질 수 있음 — 검은 여백 최소화)
+      const petImageSize = Math.max(
+        32,
+        Math.floor(Math.min(availW, availH))
+      );
       const petImageX = petX + (petBoxWidth - petImageSize) / 2;
-      const petImageY = petBoxY + 36;
+      const petImageY = petBoxY + labelRowBottom + (availH - petImageSize) / 2;
 
       if (pet) {
         const petImg = imageCache.get(pet.src);
@@ -621,11 +631,11 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
     // 노트 텍스트 그리기
     if (noteText && noteText.trim()) {
       ctx.fillStyle = "#ffffff";
-      ctx.font = "400 14px 'Noto Sans KR', sans-serif";
+      ctx.font = "400 25px 'Noto Sans KR', sans-serif";
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
       
-      const lineHeight = 20;
+      const lineHeight = 38;
       const maxLines = Math.floor(noteAreaHeight / lineHeight);
       
       // 텍스트를 줄 단위로 분리
@@ -1183,7 +1193,9 @@ export default function Page() {
     const equipCellSize = (equipTotalWidth - equipGap) / 2;
     const equipBlockHeight = 6 + equipCellSize + equipGap + equipCellSize + 6;
     const gap = 16;
-    const bottomSectionHeight = 180;
+    const bottomSectionHeight = 220;
+    const petVerticalInset = 4;
+    const petBoxHeight = bottomSectionHeight - petVerticalInset * 2;
     
     return {
       padding,
@@ -1195,7 +1207,9 @@ export default function Page() {
       equipGap,
       slotPadding,
       gap,
-      bottomSectionHeight
+      bottomSectionHeight,
+      petVerticalInset,
+      petBoxHeight
     };
   }, []);
 
@@ -1522,9 +1536,9 @@ export default function Page() {
                         className="absolute rounded border border-transparent hover:border-white/30 hover:bg-white/5 transition cursor-pointer"
                         style={{
                           left: `${petX}px`,
-                          top: "8px",
+                          top: `${canvasLayout.petVerticalInset}px`,
                           width: `${petBoxWidth}px`,
-                          height: "144px"
+                          height: `${canvasLayout.petBoxHeight}px`
                         }}
                       />
                     );
@@ -1551,9 +1565,9 @@ export default function Page() {
                       className="w-full h-full resize-none border-0 bg-transparent text-transparent caret-white placeholder:text-transparent focus:outline-none"
                       style={{ 
                         fontFamily: "'Noto Sans KR', sans-serif",
-                        fontSize: "14px",
+                        fontSize: "25px",
                         fontWeight: "400",
-                        lineHeight: "20px",
+                        lineHeight: "38px",
                         padding: "0px",
                         margin: "0px",
                         border: "none",
