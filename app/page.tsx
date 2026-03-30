@@ -633,11 +633,11 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
     // 노트 텍스트 그리기
     if (noteText && noteText.trim()) {
       ctx.fillStyle = "#ffffff";
-      ctx.font = "400 20px 'Noto Sans KR', sans-serif";
+      ctx.font = "400 16px 'Noto Sans KR', sans-serif";
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
       
-      const lineHeight = 30;
+      const lineHeight = 24;
       const maxLines = Math.floor(noteAreaHeight / lineHeight);
       
       // 텍스트를 줄 단위로 분리
@@ -1567,9 +1567,9 @@ export default function Page() {
                       className="w-full h-full resize-none border-0 bg-transparent text-transparent caret-white placeholder:text-transparent focus:outline-none"
                       style={{ 
                         fontFamily: "'Noto Sans KR', sans-serif",
-                        fontSize: "20px",
+                        fontSize: "16px",
                         fontWeight: "400",
-                        lineHeight: "30px",
+                        lineHeight: "24px",
                         padding: "0px",
                         margin: "0px",
                         border: "none",
