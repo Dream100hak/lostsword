@@ -552,12 +552,12 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
       ctx.lineWidth = 1;
       ctx.strokeRect(petX, petBoxY, petBoxWidth, petBoxHeight);
 
-      // 얇은 라벨 줄 — 아래 펫 이미지가 칸을 최대한 채우도록
-      const labelPadTop = 3;
-      const iconSize = 13;
-      const iconSpacing = 5;
+      // 진열 라벨(아이콘 + 전열/중열/후열) — 펫 아이콘 대비 밸런스
+      const labelPadTop = 5;
+      const iconSize = 24;
+      const iconSpacing = 10;
       ctx.fillStyle = "#ffffff";
-      ctx.font = "600 11px 'Noto Sans KR', sans-serif";
+      ctx.font = "600 17px 'Noto Sans KR', sans-serif";
       
       const textMetrics = ctx.measureText(label);
       const totalWidth = iconSize + iconSpacing + textMetrics.width;
@@ -573,18 +573,20 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
       ctx.textBaseline = "middle";
       ctx.fillText(label, startX + iconSize + iconSpacing, labelY);
 
-      const labelRowBottom = labelPadTop + iconSize + 2;
-      const imageSidePad = 4;
-      const imageBottomPad = 4;
+      const labelRowBottom = labelPadTop + iconSize + 4;
+      const imageSidePad = 22;
+      const imageTopGap = 14;
+      const imageBottomPad = 22;
       const availW = petBoxWidth - imageSidePad * 2;
-      const availH = petBoxHeight - labelRowBottom - imageBottomPad;
-      // 펫 칸 안에서 가능한 한 큰 정사각형(위 장비 칸보다 커질 수 있음 — 검은 여백 최소화)
+      const availH = petBoxHeight - labelRowBottom - imageTopGap - imageBottomPad;
+      // 펫 칸 안 정사각형 — 좌우·상하 여백 확보
       const petImageSize = Math.max(
         32,
         Math.floor(Math.min(availW, availH))
       );
       const petImageX = petX + (petBoxWidth - petImageSize) / 2;
-      const petImageY = petBoxY + labelRowBottom + (availH - petImageSize) / 2;
+      const petImageY =
+        petBoxY + labelRowBottom + imageTopGap + (availH - petImageSize) / 2;
 
       if (pet) {
         const petImg = imageCache.get(pet.src);
@@ -631,11 +633,11 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
     // 노트 텍스트 그리기
     if (noteText && noteText.trim()) {
       ctx.fillStyle = "#ffffff";
-      ctx.font = "400 25px 'Noto Sans KR', sans-serif";
+      ctx.font = "400 20px 'Noto Sans KR', sans-serif";
       ctx.textAlign = "left";
       ctx.textBaseline = "top";
       
-      const lineHeight = 38;
+      const lineHeight = 30;
       const maxLines = Math.floor(noteAreaHeight / lineHeight);
       
       // 텍스트를 줄 단위로 분리
@@ -1565,9 +1567,9 @@ export default function Page() {
                       className="w-full h-full resize-none border-0 bg-transparent text-transparent caret-white placeholder:text-transparent focus:outline-none"
                       style={{ 
                         fontFamily: "'Noto Sans KR', sans-serif",
-                        fontSize: "25px",
+                        fontSize: "20px",
                         fontWeight: "400",
-                        lineHeight: "38px",
+                        lineHeight: "30px",
                         padding: "0px",
                         margin: "0px",
                         border: "none",
