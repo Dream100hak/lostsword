@@ -297,5 +297,11 @@
         "name":  "코스믹엑스",
         "src":  "/assets/equip/weapon/코스믹엑스.png",
         "jobs": ["knight"]
+    },
+    {
+        "id":  "equip-50",
+        "name":  "파멸의 총애",
+        "src":  "/assets/equip/helmet/파멸의 총애.png",
+        "unique": true
     }
 ]

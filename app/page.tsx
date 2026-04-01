@@ -521,8 +521,8 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
 
     // 펫 진형 및 스킬 순서 영역
     const bottomSectionY = y;
-    const petSectionWidth = (canvasWidth - padding * 2 - 12) * 0.6;
-    const skillSectionWidth = (canvasWidth - padding * 2 - 12) * 0.4;
+    const petSectionWidth = (canvasWidth - padding * 2 - 12) * 0.55;
+    const skillSectionWidth = (canvasWidth - padding * 2 - 12) * 0.45;
 
     // 펫 진형 영역
     ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
@@ -612,7 +612,7 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
 
     // 노트 영역
     const noteX = padding + petSectionWidth + 12;
-    const noteSectionWidth = (canvasWidth - padding * 2 - 12) * 0.4;
+    const noteSectionWidth = (canvasWidth - padding * 2 - 12) * 0.45;
     const notePadding = 12;
     const noteStartY = bottomSectionY + notePadding;
     const noteAreaWidth = noteSectionWidth - notePadding * 2;
@@ -1518,10 +1518,10 @@ export default function Page() {
                 {/* 펫 진형 */}
                 <div
                   className="relative"
-                  style={{ width: "60%", height: `${canvasLayout.bottomSectionHeight}px` }}
+                  style={{ width: "55%", height: `${canvasLayout.bottomSectionHeight}px` }}
                 >
                   {(["후열", "중열", "전열"] as const).map((label, idx) => {
-                    const petSectionWidth = (1280 - canvasLayout.padding * 2 - 12) * 0.6;
+                    const petSectionWidth = (1280 - canvasLayout.padding * 2 - 12) * 0.55;
                     const petBoxWidth = (petSectionWidth - 16 - 8) / 3;
                     const petX = 8 + idx * (petBoxWidth + 4);
                     return (
@@ -1549,7 +1549,7 @@ export default function Page() {
                 {/* 노트 */}
                 <div
                   className="relative"
-                  style={{ width: "40%", height: `${canvasLayout.bottomSectionHeight}px` }}
+                  style={{ width: "45%", height: `${canvasLayout.bottomSectionHeight}px` }}
                 >
                   <div
                     className="absolute overflow-hidden"
