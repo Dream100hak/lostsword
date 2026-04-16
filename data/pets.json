@@ -198,5 +198,15 @@
         "id":  "pet-43",
         "name":  "유미",
         "src":  "/assets/pets/유미.png"
+    },
+    {
+        "id":  "pet-44",
+        "name":  "카리샤라",
+        "src":  "/assets/pets/카리샤라.png"
+    },
+    {
+        "id":  "pet-45",
+        "name":  "메이드 리타",
+        "src":  "/assets/pets/메이드 리타.png"
     }
 ]

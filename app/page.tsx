@@ -225,6 +225,10 @@ function getEquipKind(src: string): EquipKind | "other" {
   return "other";
 }
 
+function toSafeAssetSrc(src: string): string {
+  return encodeURI(src);
+}
+
 // 이미지 캐시
 const imageCache = new Map<string, HTMLImageElement>();
 
@@ -243,7 +247,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
       resolve(img);
     };
     img.onerror = reject;
-    img.src = src;
+    img.src = toSafeAssetSrc(src);
   });
 }
 
@@ -1105,13 +1109,13 @@ export default function Page() {
             key={entry.id}
             onClick={() => handleSelectToSlot(entry)}
             className={`group relative overflow-hidden rounded-lg border border-white/10 text-left transition hover:border-white/30 hover:shadow-lg hover:shadow-black/40 ${
-              isEquip ? "flex items-center gap-3 bg-black/40 px-3 py-3" : "h-16 w-full bg-black/50"
+              isEquip ? "flex items-center gap-3 bg-black/40 px-3 py-3" : "h-20 w-full bg-black/50"
             }`}
             style={
               isEquip
                 ? {}
                 : {
-                    backgroundImage: `linear-gradient(90deg, rgba(0,0,0,0.65), rgba(0,0,0,0.4)), url(${entry.src})`,
+                    backgroundImage: `linear-gradient(90deg, rgba(0,0,0,0.65), rgba(0,0,0,0.4)), url("${toSafeAssetSrc(entry.src)}")`,
                     backgroundSize: "cover",
                     backgroundPosition: "center"
                   }
@@ -1121,7 +1125,7 @@ export default function Page() {
               <>
                 <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-md border border-white/15 bg-black/40">
                   <img
-                    src={entry.src}
+                    src={toSafeAssetSrc(entry.src)}
                     alt={entry.name}
                     className="h-full w-full object-cover"
                   />
@@ -1142,15 +1146,24 @@ export default function Page() {
               </>
             ) : (
               <div className="absolute inset-0 flex items-center gap-3 px-3">
-                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border border-white/20 bg-black/40">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-md border border-white/20 bg-black/40">
                   <img
-                    src={entry.src}
+                    src={toSafeAssetSrc(entry.src)}
                     alt={entry.name}
                     className="h-full w-full object-cover"
                   />
                 </div>
                 <div className="flex flex-1 items-center justify-between gap-2">
-                  <span className="truncate text-sm font-semibold text-white">
+                  <span
+                    className="text-sm font-semibold leading-4 text-white"
+                    style={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      wordBreak: "break-word"
+                    }}
+                  >
                     {entry.name}
                   </span>
                   <span className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/90">
@@ -1675,13 +1688,13 @@ export default function Page() {
                           key={entry.id}
                           onClick={() => handleSelectToSlot(entry)}
                           className={`group relative overflow-hidden rounded-lg border border-white/10 text-left transition hover:border-white/30 hover:shadow-lg hover:shadow-black/40 ${
-                            picker === "equip" ? "aspect-[3/4] bg-black/40" : "h-16 w-full bg-black/50"
+                            picker === "equip" ? "aspect-[3/4] bg-black/40" : "h-20 w-full bg-black/50"
                           }`}
                           style={
                             picker === "equip"
                               ? {}
                               : {
-                                  backgroundImage: `linear-gradient(90deg, rgba(0,0,0,0.65), rgba(0,0,0,0.4)), url(${entry.src})`,
+                                  backgroundImage: `linear-gradient(90deg, rgba(0,0,0,0.65), rgba(0,0,0,0.4)), url("${toSafeAssetSrc(entry.src)}")`,
                                   backgroundSize: "cover",
                                   backgroundPosition: "center"
                                 }
@@ -1690,7 +1703,7 @@ export default function Page() {
                           {picker === "equip" ? (
                             <>
                               <img
-                                src={entry.src}
+                                src={toSafeAssetSrc(entry.src)}
                                 alt={entry.name}
                                 className="h-full w-full object-cover"
                               />
@@ -1710,15 +1723,24 @@ export default function Page() {
                             </>
                           ) : (
                             <div className="absolute inset-0 flex items-center gap-3 px-3">
-                              <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border border-white/20 bg-black/40">
+                              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-md border border-white/20 bg-black/40">
                                 <img
-                                  src={entry.src}
+                                  src={toSafeAssetSrc(entry.src)}
                                   alt={entry.name}
                                   className="h-full w-full object-cover"
                                 />
                               </div>
                               <div className="flex flex-1 items-center justify-between gap-2">
-                                <span className="truncate text-sm font-semibold text-white">
+                                <span
+                                  className="text-sm font-semibold leading-4 text-white"
+                                  style={{
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: "vertical",
+                                    overflow: "hidden",
+                                    wordBreak: "break-word"
+                                  }}
+                                >
                                   {entry.name}
                                 </span>
                                 <span className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/90">

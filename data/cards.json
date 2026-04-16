@@ -243,5 +243,15 @@
         "id":  "card-52",
         "name":  "눈꽃의 틈(유미)",
         "src":  "/assets/cards/눈꽃의틈(유미).png"
+    },
+    {
+        "id":  "card-53",
+        "name":  "러블리 메이드(메이드 리타)",
+        "src":  "/assets/cards/러블리메이드(메이드 리타).png"
+    },
+    {
+        "id":  "card-54",
+        "name":  "첫사랑한정(카리샤라)",
+        "src":  "/assets/cards/첫사랑한정(카리샤라).png"
     }
 ]

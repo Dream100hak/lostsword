@@ -269,5 +269,15 @@
         "src":  "/assets/chars/니무에.png",
         "job": "mage",
         "sortOrder": -999
+    },
+    {
+        "id":  "char-49",
+        "name":  "카리샤라",
+        "src":  "/assets/chars/카리샤라.png"
+    },
+    {
+        "id":  "char-50",
+        "name":  "메이드 리타",
+        "src":  "/assets/chars/메이드 리타.png"
     }
 ]
