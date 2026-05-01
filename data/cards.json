@@ -253,5 +253,10 @@
         "id":  "card-54",
         "name":  "첫사랑한정(카리샤라)",
         "src":  "/assets/cards/첫사랑한정(카리샤라).png"
+    },
+    {
+        "id":  "card-55",
+        "name":  "절대왕권(보티건)",
+        "src":  "/assets/cards/절대왕권(보티건).png"
     }
 ]

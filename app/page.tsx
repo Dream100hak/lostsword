@@ -22,7 +22,7 @@ type LibraryItem = {
   sortOrder?: number;
   /** 캐릭터 전용 — `knight` | `archer` | `mage` | `healer` (chars.json) */
   job?: JobId;
-  /** 무기 전용 — 착용 가능 직업. 생략 시 전 직업 (equip.json, weapon 경로만 사용) */
+  /** 무기·룬 등 — 착용 가능 직업. 생략·빈 배열이면 전 직업 (equip.json) */
   jobs?: JobId[];
 };
 
@@ -511,6 +511,19 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
           if (equipImg && equipImg.complete) {
             ctx.drawImage(equipImg, equipX, equipY, equipCellSize, equipCellSize);
           }
+          if (equip.unique) {
+            ctx.strokeStyle = "rgba(167, 139, 250, 0.9)";
+            ctx.lineWidth = 2.5;
+            roundRect(
+              ctx,
+              equipX + 1,
+              equipY + 1,
+              equipCellSize - 2,
+              equipCellSize - 2,
+              3
+            );
+            ctx.stroke();
+          }
         } else {
           ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
           ctx.font = "400 12px 'Noto Sans KR', sans-serif";
@@ -743,6 +756,26 @@ export default function Page() {
   const [presetApplySlotIndex, setPresetApplySlotIndex] = useState(0);
   const [layoutPresets, setLayoutPresets] = useState<LayoutPreset[]>([]);
   const [layoutPresetName, setLayoutPresetName] = useState("");
+  /** 모바일에서 1280 고정 + scale 로 인한 가로 넘침 방지 — 뷰포트 너비에 맞춤 */
+  const [canvasLayoutWidth, setCanvasLayoutWidth] = useState(1280);
+
+  useEffect(() => {
+    function updateCanvasLayoutWidth() {
+      if (typeof window === "undefined") return;
+      const vw = window.innerWidth;
+      const mainPad = vw < 640 ? 24 : 48;
+      const canvasPad = 32;
+      const safety = 8;
+      const next = Math.min(
+        1280,
+        Math.max(280, Math.floor(vw - mainPad - canvasPad - safety))
+      );
+      setCanvasLayoutWidth(next);
+    }
+    updateCanvasLayoutWidth();
+    window.addEventListener("resize", updateCanvasLayoutWidth);
+    return () => window.removeEventListener("resize", updateCanvasLayoutWidth);
+  }, []);
 
   const initialCharSlots = useMemo(
     () =>
@@ -1002,11 +1035,9 @@ export default function Page() {
     } else if (slotTarget.type === "equip" && slotTarget.equipKind) {
       const kind = slotTarget.equipKind as EquipKind;
       const slotIdx = slotTarget.slotIndex;
-      if (kind === "weapon") {
-        const charJob = charSlots[slotIdx].char?.job;
-        if (!weaponMatchesCharacterJob(item, charJob ?? null)) {
-          return;
-        }
+      const charJob = charSlots[slotIdx].char?.job;
+      if (!weaponMatchesCharacterJob(item, charJob ?? null)) {
+        return;
       }
       const isUnique = uniqueEquipIds.has(item.id);
       setCharSlots((prev) =>
@@ -1067,15 +1098,12 @@ export default function Page() {
     if (slotTarget.type === "equip" && slotTarget.equipKind) {
       const pickKind = slotTarget.equipKind;
       const pickSlot = slotTarget.slotIndex;
-      const charJobForWeapon = charSlots[pickSlot].char?.job;
+      const charJobForEquip = charSlots[pickSlot].char?.job;
       list = equipWithType
         .filter((eq) => eq.kind === pickKind || eq.kind === "other")
-        .filter((eq) => {
-          if (pickKind === "weapon" && (eq.kind === "weapon" || eq.kind === "other")) {
-            return weaponMatchesCharacterJob(eq as LibraryItem, charJobForWeapon ?? null);
-          }
-          return true;
-        })
+        .filter((eq) =>
+          weaponMatchesCharacterJob(eq as LibraryItem, charJobForEquip ?? null)
+        )
         .filter((eq) => {
           if (!uniqueEquipIds.has(eq.id)) return true;
           return !isUniqueEquipBlockedElsewhere(eq.id, pickSlot, pickKind, charSlots);
@@ -1100,15 +1128,19 @@ export default function Page() {
       <div
         className={
           isEquip
-            ? "grid min-h-0 grid-cols-2 gap-3 md:grid-cols-3"
-            : "grid min-h-0 grid-cols-2 gap-2 md:grid-cols-3"
+            ? "grid min-h-0 grid-cols-1 gap-3 min-[420px]:grid-cols-2 md:grid-cols-3"
+            : "grid min-h-0 grid-cols-1 gap-2 min-[420px]:grid-cols-2 md:grid-cols-3"
         }
       >
         {sorted.map((entry) => (
           <button
             key={entry.id}
             onClick={() => handleSelectToSlot(entry)}
-            className={`group relative overflow-hidden rounded-lg border border-white/10 text-left transition hover:border-white/30 hover:shadow-lg hover:shadow-black/40 ${
+            className={`group relative overflow-hidden rounded-lg text-left transition hover:shadow-lg hover:shadow-black/40 ${
+              isEquip && uniqueEquipIds.has(entry.id)
+                ? "border-2 border-violet-400/75 shadow-[0_0_18px_rgba(139,92,246,0.22)] hover:border-violet-300 hover:shadow-violet-500/15"
+                : "border border-white/10 hover:border-white/30"
+            } ${
               isEquip ? "flex items-center gap-3 bg-black/40 px-3 py-3" : "h-20 w-full bg-black/50"
             }`}
             style={
@@ -1123,7 +1155,13 @@ export default function Page() {
           >
             {isEquip ? (
               <>
-                <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-md border border-white/15 bg-black/40">
+                <div
+                  className={`flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-md bg-black/40 ${
+                    uniqueEquipIds.has(entry.id)
+                      ? "border-2 border-violet-400/55"
+                      : "border border-white/15"
+                  }`}
+                >
                   <img
                     src={toSafeAssetSrc(entry.src)}
                     alt={entry.name}
@@ -1197,7 +1235,7 @@ export default function Page() {
 
   // 캔버스 레이아웃 계산값 (오버레이 버튼 위치와 정확히 맞추기 위해)
   const canvasLayout = useMemo(() => {
-    const width = 1280;
+    const width = canvasLayoutWidth;
     const padding = 16;
     const slotPadding = 8;
     const slotWidth = (width - padding * 2 - 16 * 4) / 5; // gap 16px * 4
@@ -1213,6 +1251,7 @@ export default function Page() {
     const petBoxHeight = bottomSectionHeight - petVerticalInset * 2;
     
     return {
+      layoutWidth: width,
       padding,
       slotWidth,
       charImageHeight,
@@ -1226,13 +1265,13 @@ export default function Page() {
       petVerticalInset,
       petBoxHeight
     };
-  }, []);
+  }, [canvasLayoutWidth]);
 
   return (
-    <main className="flex min-h-screen flex-col gap-6 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-6 py-8">
+    <main className="flex min-h-screen flex-col gap-4 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-3 py-4 sm:gap-6 sm:px-6 sm:py-8">
       <header className="flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-3">
-          <h1 className="text-2xl font-bold tracking-tight text-white">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
             LostSword 택틱 배치
           </h1>
           <div className="flex items-center gap-2">
@@ -1418,10 +1457,12 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="flex justify-center relative">
+      <section className="relative flex w-full justify-center overflow-x-auto">
         <div
-          className={`relative rounded border border-white/10 bg-canvas p-4 shadow-2xl shadow-black/50 origin-top-left ${
-            compactView ? "scale-[0.85]" : "scale-[1.1]"
+          className={`relative max-w-full rounded border border-white/10 bg-canvas p-2 shadow-2xl shadow-black/50 origin-top-left sm:p-4 ${
+            compactView
+              ? "scale-100 md:scale-[0.85]"
+              : "scale-100 md:scale-[1.1]"
           }`}
         >
           <PreviewCanvas
@@ -1429,17 +1470,12 @@ export default function Page() {
             charSlots={charSlots}
             petFormationSlots={petFormationSlots}
             noteText={noteText}
-            width={1280}
+            width={canvasLayoutWidth}
           />
           
           {/* 편집용 DOM UI - 클릭 가능한 오버레이 */}
           {/* 컨테이너의 p-4 (16px) 패딩을 고려하여 오버레이 배치 */}
-          <div className="absolute pointer-events-none" style={{ 
-            top: "16px",
-            left: "16px", 
-            right: "16px",
-            bottom: "16px"
-          }}>
+          <div className="pointer-events-none absolute inset-2 sm:inset-4">
             <div className="w-full h-full pointer-events-auto flex flex-col" style={{ 
               paddingLeft: `${canvasLayout.padding}px`, 
               paddingTop: `${canvasLayout.padding}px`,
@@ -1534,7 +1570,8 @@ export default function Page() {
                   style={{ width: "55%", height: `${canvasLayout.bottomSectionHeight}px` }}
                 >
                   {(["후열", "중열", "전열"] as const).map((label, idx) => {
-                    const petSectionWidth = (1280 - canvasLayout.padding * 2 - 12) * 0.55;
+                    const petSectionWidth =
+                      (canvasLayout.layoutWidth - canvasLayout.padding * 2 - 12) * 0.55;
                     const petBoxWidth = (petSectionWidth - 16 - 8) / 3;
                     const petX = 8 + idx * (petBoxWidth + 4);
                     return (
@@ -1606,11 +1643,11 @@ export default function Page() {
       {/* 선택 모달 */}
       {picker && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          className="fixed inset-0 z-50 flex items-stretch justify-center bg-black/60 p-2 sm:items-center sm:p-4"
           onClick={(e) => e.target === e.currentTarget && (setPicker(null), setSlotTarget(null))}
         >
           <div
-            className="flex h-[min(85vh,56rem)] w-full max-w-4xl flex-col gap-3 rounded-2xl border border-white/10 bg-slate-900 p-4 shadow-2xl shadow-black/50"
+            className="flex h-[min(92dvh,68rem)] max-h-[min(92dvh,68rem)] w-full max-w-6xl flex-col gap-3 rounded-xl border border-white/10 bg-slate-900 p-3 shadow-2xl shadow-black/50 sm:rounded-2xl sm:p-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-shrink-0 items-center justify-between">
@@ -1682,14 +1719,22 @@ export default function Page() {
                     return listSortRank(b) - listSortRank(a);
                   });
                   return (
-                    <div className={picker === "equip" ? "grid grid-cols-2 gap-3" : "flex flex-col gap-2"}>
+                    <div
+                      className={
+                        picker === "equip"
+                          ? "grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 md:grid-cols-3"
+                          : "flex flex-col gap-2"
+                      }
+                    >
                       {sorted.map((entry) => (
                         <button
                           key={entry.id}
                           onClick={() => handleSelectToSlot(entry)}
-                          className={`group relative overflow-hidden rounded-lg border border-white/10 text-left transition hover:border-white/30 hover:shadow-lg hover:shadow-black/40 ${
-                            picker === "equip" ? "aspect-[3/4] bg-black/40" : "h-20 w-full bg-black/50"
-                          }`}
+                          className={`group relative overflow-hidden rounded-lg text-left transition hover:shadow-lg hover:shadow-black/40 ${
+                            picker === "equip" && uniqueEquipIds.has(entry.id)
+                              ? "border-2 border-violet-400/75 shadow-[0_0_18px_rgba(139,92,246,0.22)] hover:border-violet-300 hover:shadow-violet-500/15"
+                              : "border border-white/10 hover:border-white/30"
+                          } ${picker === "equip" ? "aspect-[3/4] bg-black/40" : "h-20 w-full bg-black/50"}`}
                           style={
                             picker === "equip"
                               ? {}

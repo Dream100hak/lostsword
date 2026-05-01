@@ -303,5 +303,60 @@
         "name":  "파멸의 총애",
         "src":  "/assets/equip/helmet/파멸의 총애.png",
         "unique": true
+    },
+    {
+        "id":  "equip-51",
+        "name":  "화룡의갑옷",
+        "src":  "/assets/equip/armor/화룡의갑옷.png",
+        "sortOrder": 991
+    },
+    {
+        "id":  "equip-52",
+        "name":  "화룡의투구",
+        "src":  "/assets/equip/helmet/화룡의투구.png",
+        "sortOrder": 991
+    },
+    {
+        "id":  "equip-53",
+        "name":  "치유의룬",
+        "src":  "/assets/equip/roon/치유의룬.png",
+        "jobs": ["healer"],
+        "sortOrder": 992
+    },
+    {
+        "id":  "equip-54",
+        "name":  "집중의룬",
+        "src":  "/assets/equip/roon/집중의룬.png",
+        "jobs": ["knight", "mage" , "archer"],
+        "sortOrder": 993
+    },
+    {
+        "id":  "equip-55",
+        "name":  "화룡의깃발",
+        "src":  "/assets/equip/weapon/화룡의깃발.png",
+        "jobs": ["mage", "healer"],
+        "sortOrder": 1012
+    },
+    {
+        "id":  "equip-56",
+        "name":  "화룡의환도",
+        "src":  "/assets/equip/weapon/화룡의환도.png",
+        "jobs": ["knight"],
+        "sortOrder": 1013
+    },
+    {
+        "id":  "equip-57",
+        "name":  "화룡의강궁",
+        "src":  "/assets/equip/weapon/화룡의강궁.png",
+        "jobs": ["archer"],
+        "sortOrder": 1014
+    },
+    {
+        "id":  "equip-58",
+        "name":  "클라우솔라스-카오틱",
+        "src":  "/assets/equip/weapon/클라우솔라스-카오틱.png",
+        "jobs": ["mage"],
+        "sortOrder": 1015,
+        "unique": true
     }
 ]

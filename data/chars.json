@@ -273,11 +273,13 @@
     {
         "id":  "char-49",
         "name":  "카리샤라",
-        "src":  "/assets/chars/카리샤라.png"
+        "src":  "/assets/chars/카리샤라.png",
+        "job": "mage"
     },
     {
         "id":  "char-50",
         "name":  "메이드 리타",
-        "src":  "/assets/chars/메이드 리타.png"
+        "src":  "/assets/chars/메이드 리타.png",
+        "job": "healer"
     }
 ]
