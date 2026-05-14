@@ -208,5 +208,10 @@
         "id":  "pet-45",
         "name":  "메이드 리타",
         "src":  "/assets/pets/메이드 리타.png"
+    },
+    {
+        "id":  "pet-46",
+        "name":  "아그라베인",
+        "src":  "/assets/pets/아그라베인.png"
     }
 ]

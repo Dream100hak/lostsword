@@ -258,5 +258,10 @@
         "id":  "card-55",
         "name":  "절대왕권(보티건)",
         "src":  "/assets/cards/절대왕권(보티건).png"
+    },
+    {
+        "id":  "card-56",
+        "name":  "그림자속에숨겨진(아그라베인)",
+        "src":  "/assets/cards/그림자속에숨겨진(아그라베인).png"
     }
 ]

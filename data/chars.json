@@ -281,5 +281,11 @@
         "name":  "메이드 리타",
         "src":  "/assets/chars/메이드 리타.png",
         "job": "healer"
+    },
+    {
+        "id":  "char-51",
+        "name":  "아그라베인",
+        "src":  "/assets/chars/아그라베인.png",
+        "job": "archer"
     }
 ]
