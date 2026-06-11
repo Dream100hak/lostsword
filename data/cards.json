@@ -263,5 +263,10 @@
         "id":  "card-56",
         "name":  "그림자속에숨겨진(아그라베인)",
         "src":  "/assets/cards/그림자속에숨겨진(아그라베인).png"
+    },
+    {
+        "id":  "card-57",
+        "name":  "빅 보스(루미)",
+        "src":  "/assets/cards/빅 보스(루미).png"
     }
 ]

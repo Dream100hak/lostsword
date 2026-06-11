@@ -287,5 +287,11 @@
         "name":  "아그라베인",
         "src":  "/assets/chars/아그라베인.png",
         "job": "archer"
+    },
+     {
+        "id":  "char-52",
+        "name":  "루미",
+        "src":  "/assets/chars/루미.png",
+        "job": "knight"
     }
 ]
