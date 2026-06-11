@@ -1149,7 +1149,7 @@ export default function Page() {
                 : {
                     backgroundImage: `linear-gradient(90deg, rgba(0,0,0,0.65), rgba(0,0,0,0.4)), url("${toSafeAssetSrc(entry.src)}")`,
                     backgroundSize: "cover",
-                    backgroundPosition: "center"
+                    backgroundPosition: "center 30%"
                   }
             }
           >
@@ -1188,7 +1188,7 @@ export default function Page() {
                   <img
                     src={toSafeAssetSrc(entry.src)}
                     alt={entry.name}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover object-top"
                   />
                 </div>
                 <div className="flex flex-1 items-center justify-between gap-2">
@@ -1741,7 +1741,7 @@ export default function Page() {
                               : {
                                   backgroundImage: `linear-gradient(90deg, rgba(0,0,0,0.65), rgba(0,0,0,0.4)), url("${toSafeAssetSrc(entry.src)}")`,
                                   backgroundSize: "cover",
-                                  backgroundPosition: "center"
+                                  backgroundPosition: "center 30%"
                                 }
                           }
                         >
@@ -1772,7 +1772,7 @@ export default function Page() {
                                 <img
                                   src={toSafeAssetSrc(entry.src)}
                                   alt={entry.name}
-                                  className="h-full w-full object-cover"
+                                  className="h-full w-full object-cover object-top"
                                 />
                               </div>
                               <div className="flex flex-1 items-center justify-between gap-2">
