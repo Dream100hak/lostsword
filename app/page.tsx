@@ -156,6 +156,8 @@ type EquipKind = "weapon" | "armor" | "helmet" | "roon";
 
 /** 진영(레인) — front=전열(빨강), mid=중열(노랑), back=후열(파랑) */
 type Lane = "front" | "mid" | "back";
+/** 같은 열 안의 위(▲)·아래(▼) 슬롯 */
+type LanePos = "top" | "bottom";
 
 const LANE_META: Record<Lane, { label: string; color: string; icon: string }> = {
   front: { label: "전열", color: "#ef4444", icon: "/assets/lane-front.png" },
@@ -163,14 +165,23 @@ const LANE_META: Record<Lane, { label: string; color: string; icon: string }> = 
   back: { label: "후열", color: "#3b82f6", icon: "/assets/lane-back.png" }
 };
 
-/** 클릭 순환 순서: 전열 → 중열 → 후열 → 없음 */
-const LANE_CYCLE: (Lane | null)[] = ["front", "mid", "back", null];
+/** 클릭 순환: 전열위 → 전열아래 → 중열위 → 중열아래 → 후열위 → 후열아래 → 없음 */
+const LANE_POS_CYCLE: ({ lane: Lane; pos: LanePos } | null)[] = [
+  { lane: "front", pos: "top" },
+  { lane: "front", pos: "bottom" },
+  { lane: "mid", pos: "top" },
+  { lane: "mid", pos: "bottom" },
+  { lane: "back", pos: "top" },
+  { lane: "back", pos: "bottom" },
+  null
+];
 
 type CharSlot = {
   id: string;
   char: LibraryItem | null;
   card: LibraryItem | null;
   lane: Lane | null;
+  lanePos: LanePos | null;
   equips: {
     weapon: LibraryItem | null;
     armor: LibraryItem | null;
@@ -227,6 +238,7 @@ type LayoutPreset = {
     charId: string | null;
     cardId: string | null;
     lane?: Lane | null;
+    lanePos?: LanePos | null;
     weaponId: string | null;
     armorId: string | null;
     helmetId: string | null;
@@ -589,17 +601,37 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // 라벨은 가운데, 아이콘은 오른쪽 (펫 진영과 동일한 아이콘 사용)
+        // 세모(▲위/▼아래)를 라벨 바로 왼쪽에 붙여 한 묶음으로 가운데, 아이콘은 오른쪽
         const laneIcon = imageCache.get(meta.icon);
         const hasIcon = !!(laneIcon && laneIcon.complete);
         const iconSize = 16;
         const iconRightPad = 6;
         const midY = slotY + barH / 2;
+        const pos = slot.lanePos ?? "top";
         ctx.font = "700 13px 'Noto Sans KR', sans-serif";
+        const labelW = ctx.measureText(meta.label).width;
+        const triS = 5;
+        const triGap = 5;
+        const groupX = slotX + (barW - (labelW + triGap + triS * 2)) / 2;
+        // 라벨 먼저
         ctx.fillStyle = "#ffffff";
-        ctx.textAlign = "center";
+        ctx.textAlign = "left";
         ctx.textBaseline = "middle";
-        ctx.fillText(meta.label, slotX + barW / 2, midY + 1);
+        ctx.fillText(meta.label, groupX, midY + 1);
+        // 세모(▲위/▼아래)는 라벨 바로 오른쪽
+        const triCX = groupX + labelW + triGap + triS;
+        ctx.beginPath();
+        if (pos === "bottom") {
+          ctx.moveTo(triCX - triS, midY - triS + 1);
+          ctx.lineTo(triCX + triS, midY - triS + 1);
+          ctx.lineTo(triCX, midY + triS + 1);
+        } else {
+          ctx.moveTo(triCX - triS, midY + triS + 1);
+          ctx.lineTo(triCX + triS, midY + triS + 1);
+          ctx.lineTo(triCX, midY - triS + 1);
+        }
+        ctx.closePath();
+        ctx.fill();
         if (hasIcon) {
           ctx.drawImage(
             laneIcon,
@@ -959,6 +991,7 @@ export default function Page() {
         char: null as LibraryItem | null,
         card: null as LibraryItem | null,
         lane: null as Lane | null,
+        lanePos: null as LanePos | null,
         equips: {
           weapon: null as LibraryItem | null,
           armor: null as LibraryItem | null,
@@ -1086,6 +1119,7 @@ export default function Page() {
         charId: null,
         cardId: null,
         lane: null,
+        lanePos: null,
         weaponId: null,
         armorId: null,
         helmetId: null,
@@ -1099,6 +1133,7 @@ export default function Page() {
       char: findLibraryItemById(libChars, s.charId),
       card: findLibraryItemById(libCards, s.cardId),
       lane: s.lane ?? null,
+      lanePos: s.lanePos ?? null,
       equips: {
         weapon: findEquipById(s.weaponId),
         armor: findEquipById(s.armorId),
@@ -1123,6 +1158,7 @@ export default function Page() {
       charId: slot.char?.id ?? null,
       cardId: slot.card?.id ?? null,
       lane: slot.lane ?? null,
+      lanePos: slot.lanePos ?? null,
       weaponId: slot.equips.weapon?.id ?? null,
       armorId: slot.equips.armor?.id ?? null,
       helmetId: slot.equips.helmet?.id ?? null,
@@ -1439,16 +1475,23 @@ export default function Page() {
 
   const clearCharSlot = (slotIndex: number) =>
     setCharSlots((prev) =>
-      prev.map((s, i) => (i === slotIndex ? { ...s, char: null, lane: null } : s))
+      prev.map((s, i) =>
+        i === slotIndex ? { ...s, char: null, lane: null, lanePos: null } : s
+      )
     );
 
   const cycleCharLane = (slotIndex: number) =>
     setCharSlots((prev) =>
       prev.map((s, i) => {
         if (i !== slotIndex) return s;
-        const cur = s.lane ?? null;
-        const next = LANE_CYCLE[(LANE_CYCLE.indexOf(cur) + 1) % LANE_CYCLE.length];
-        return { ...s, lane: next };
+        const curPos = s.lanePos ?? "top";
+        const curIdx = LANE_POS_CYCLE.findIndex((e) =>
+          e === null ? s.lane === null : e.lane === s.lane && e.pos === curPos
+        );
+        const next = LANE_POS_CYCLE[(curIdx + 1) % LANE_POS_CYCLE.length];
+        return next === null
+          ? { ...s, lane: null, lanePos: null }
+          : { ...s, lane: next.lane, lanePos: next.pos };
       })
     );
 
@@ -1849,7 +1892,7 @@ export default function Page() {
                                 e.stopPropagation();
                                 cycleCharLane(idx);
                               }}
-                              title="진영 변경 (전열 → 중열 → 후열 → 없음)"
+                              title="진영 변경 (전열위 → 전열아래 → 중열위 → 중열아래 → 후열위 → 후열아래 → 없음)"
                               aria-label="진영 변경"
                               className={`absolute inset-x-0 top-0 z-10 flex items-center justify-center rounded-t text-[11px] font-bold transition ${
                                 slot.lane ? "text-white" : "text-white/85 opacity-0 group-hover:opacity-100"
@@ -1864,6 +1907,9 @@ export default function Page() {
                               {slot.lane ? (
                                 <>
                                   {LANE_META[slot.lane].label}
+                                  <span className="ml-1 text-[8px] leading-none">
+                                    {slot.lanePos === "bottom" ? "▼" : "▲"}
+                                  </span>
                                   <img
                                     src={toSafeAssetSrc(LANE_META[slot.lane].icon)}
                                     alt=""
