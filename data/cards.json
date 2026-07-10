@@ -268,5 +268,10 @@
         "id":  "card-57",
         "name":  "빅 보스(루미)",
         "src":  "/assets/cards/빅 보스(루미).png"
+    },
+    {
+        "id":  "card-58",
+        "name":  "영겁의 화염(염제)",
+        "src":  "/assets/cards/영겁의화염(염제).png"
     }
 ]

@@ -293,5 +293,11 @@
         "name":  "루미",
         "src":  "/assets/chars/루미.png",
         "job": "knight"
+    },
+    {
+        "id":  "char-53",
+        "name":  "염제",
+        "src":  "/assets/chars/염제.png",
+        "job": "knight"
     }
 ]
