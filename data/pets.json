@@ -223,5 +223,10 @@
         "id":  "pet-48",
         "name":  "염제",
         "src":  "/assets/pets/염제.png"
+    },
+    {
+        "id":  "pet-49",
+        "name":  "클라리스",
+        "src":  "/assets/pets/클라리스.png"
     }
 ]

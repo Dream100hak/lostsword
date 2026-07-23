@@ -273,5 +273,10 @@
         "id":  "card-58",
         "name":  "영겁의 화염(염제)",
         "src":  "/assets/cards/영겁의화염(염제).png"
+    },
+    {
+        "id":  "card-59",
+        "name":  "예정된 패배(클라리스)",
+        "src":  "/assets/cards/예정된패배(클라리스).png"
     }
 ]

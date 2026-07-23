@@ -299,5 +299,11 @@
         "name":  "염제",
         "src":  "/assets/chars/염제.png",
         "job": "knight"
+    },
+      {
+        "id":  "char-54",
+        "name":  "클라리스",
+        "src":  "/assets/chars/클라리스.png",
+        "job": "knight"
     }
 ]

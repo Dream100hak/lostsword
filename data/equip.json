@@ -358,5 +358,62 @@
         "jobs": ["mage"],
         "sortOrder": 1015,
         "unique": true
+    },
+    {
+        "id":  "equip-59",
+        "name":  "제국제장검",
+        "src":  "/assets/equip/weapon/제국제장검.png",
+        "jobs": ["knight"],
+        "sortOrder": 1016
+    },
+    {
+        "id":  "equip-60",
+        "name":  "제국제지팡이",
+        "src":  "/assets/equip/weapon/제국제지팡이.png",
+        "jobs": ["mage"],
+        "sortOrder": 1017
+    }
+    ,
+    {
+        "id":  "equip-61",
+        "name":  "제국제석궁",
+        "src":  "/assets/equip/weapon/제국제석궁.png",
+        "jobs": ["archer"],
+        "sortOrder": 1018
+    },
+    {
+        "id":  "equip-62",
+        "name":  "제국의그림자",
+        "src":  "/assets/equip/armor/제국의그림자.png",
+        "jobs": ["archer" , "healer" , "knight" , "mage"],
+        "sortOrder": 1019
+    },
+    {
+        "id":  "equip-63",
+        "name":  "제국의영광",
+        "src":  "/assets/equip/helmet/제국의영광.png",
+        "jobs": ["archer" , "healer" , "knight" , "mage"],
+        "sortOrder": 1020
+    },
+    {
+        "id":  "equip-64",
+        "name":  "제국의심장",
+        "src":  "/assets/equip/roon/제국의심장.png",
+        "jobs": ["archer" , "healer" , "knight" , "mage"],
+        "sortOrder": 1021
+    },
+    {
+        "id":  "equip-65",
+        "name":  "도미네이션",
+        "src":  "/assets/equip/weapon/도미네이션.png",
+        "jobs": ["mage"],
+        "sortOrder": 1022
+    },
+    {
+        "id":  "equip-66",
+        "name":  "기계식연발석궁",
+        "src":  "/assets/equip/weapon/기계식연발석궁.png",
+        "jobs": ["archer"],
+        "sortOrder": 1023
     }
 ]
