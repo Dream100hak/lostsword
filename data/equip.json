@@ -370,7 +370,7 @@
         "id":  "equip-60",
         "name":  "제국제지팡이",
         "src":  "/assets/equip/weapon/제국제지팡이.png",
-        "jobs": ["mage"],
+        "jobs": ["mage","healer"],
         "sortOrder": 1017
     }
     ,
