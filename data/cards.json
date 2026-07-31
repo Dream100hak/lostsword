@@ -278,5 +278,10 @@
         "id":  "card-59",
         "name":  "예정된 패배(클라리스)",
         "src":  "/assets/cards/예정된패배(클라리스).png"
+    },
+    {
+        "id":  "card-60",
+        "name":  "달콤한 오후(루에이라)",
+        "src":  "/assets/cards/달콤한오후(루에이라).png"
     }
 ]
