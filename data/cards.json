@@ -283,5 +283,10 @@
         "id":  "card-60",
         "name":  "달콤한 오후(루에이라)",
         "src":  "/assets/cards/달콤한오후(루에이라).png"
+    },
+    {
+        "id":  "card-61",
+        "name":  "황홀경의 성전(니아)",
+        "src":  "/assets/cards/황홀경의성전(니아).png"
     }
 ]

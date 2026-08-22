@@ -305,5 +305,11 @@
         "name":  "클라리스",
         "src":  "/assets/chars/클라리스.png",
         "job": "knight"
+    },
+    {
+        "id":  "char-55",
+        "name":  "니아",
+        "src":  "/assets/chars/니아.png",
+        "job": "knight"
     }
 ]
