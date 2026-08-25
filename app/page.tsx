@@ -1,13 +1,26 @@
 "use client";
 
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import cards from "@/data/cards.json";
 import chars from "@/data/chars.json";
 import equips from "@/data/equip.json";
 import pets from "@/data/pets.json";
-import type { ItemType } from "@/lib/store";
 import type { JobId } from "@/lib/jobs";
 import { weaponMatchesCharacterJob } from "@/lib/jobs";
+
+/** SSR 경고 없이 첫 페인트 전에 실행 — 초기 '맞춤' 배율이 깜빡이지 않도록 */
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+type ItemType = "card" | "char" | "pet" | "equip";
 
 type IconProps = { className?: string };
 
@@ -936,7 +949,6 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
       style={{
         display: "block",
         width: `${width}px`,
-        maxWidth: "100%",
         height: "auto"
       }}
     />
@@ -945,10 +957,16 @@ const PreviewCanvas = forwardRef<HTMLCanvasElement, {
 
 PreviewCanvas.displayName = "PreviewCanvas";
 
+/** 캔버스 논리 폭 — 화면 크기와 무관하게 고정 (저장되는 PNG가 기기마다 달라지지 않도록) */
+const BOARD_CANVAS_WIDTH = 1280;
+/** 보드 컨테이너 프레임 = padding 16 + border 1 */
+const BOARD_FRAME = 17;
+const MIN_ZOOM = 0.2;
+const MAX_ZOOM = 2;
+
 export default function Page() {
   const [picker, setPicker] = useState<ItemType | null>(null);
   const [showPresets, setShowPresets] = useState(false);
-  const [compactView, setCompactView] = useState(false);
   const [search, setSearch] = useState("");
   const [slotTarget, setSlotTarget] = useState<{
     type: "char" | "card" | "pet" | "equip";
@@ -963,26 +981,121 @@ export default function Page() {
   const [presetApplySlotIndex, setPresetApplySlotIndex] = useState(0);
   const [layoutPresets, setLayoutPresets] = useState<LayoutPreset[]>([]);
   const [layoutPresetName, setLayoutPresetName] = useState("");
-  /** 모바일에서 1280 고정 + scale 로 인한 가로 넘침 방지 — 뷰포트 너비에 맞춤 */
-  const [canvasLayoutWidth, setCanvasLayoutWidth] = useState(1280);
 
-  useEffect(() => {
-    function updateCanvasLayoutWidth() {
-      if (typeof window === "undefined") return;
-      const vw = window.innerWidth;
-      const mainPad = vw < 640 ? 24 : 48;
-      const canvasPad = 32;
-      const safety = 8;
-      const next = Math.min(
-        1280,
-        Math.max(280, Math.floor(vw - mainPad - canvasPad - safety))
-      );
-      setCanvasLayoutWidth(next);
-    }
-    updateCanvasLayoutWidth();
-    window.addEventListener("resize", updateCanvasLayoutWidth);
-    return () => window.removeEventListener("resize", updateCanvasLayoutWidth);
+  /**
+   * 캔버스는 기기와 무관하게 항상 1280 논리폭으로 그린다.
+   * 좁은 화면에서는 CSS transform 으로 축소해 보여줄 뿐이라
+   * 편집 화면과 저장되는 PNG 가 언제나 동일하다.
+   */
+  const canvasLayoutWidth = BOARD_CANVAS_WIDTH;
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const zoomRef = useRef(1);
+  const [zoom, setZoom] = useState(1);
+  const [zoomMode, setZoomMode] = useState<"fit" | "manual">("fit");
+
+  /** 화면상의 한 점(anchor)을 고정한 채 확대/축소 */
+  const applyZoom = useCallback(
+    (next: number, anchor?: { x: number; y: number }) => {
+      const clamped = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, next));
+      const el = viewportRef.current;
+      if (!el) {
+        zoomRef.current = clamped;
+        setZoom(clamped);
+        return;
+      }
+      const rect = el.getBoundingClientRect();
+      const ax = (anchor?.x ?? rect.left + rect.width / 2) - rect.left;
+      const ay = (anchor?.y ?? rect.top + rect.height / 2) - rect.top;
+      const prev = zoomRef.current;
+      const contentX = (el.scrollLeft + ax) / prev;
+      const contentY = (el.scrollTop + ay) / prev;
+      zoomRef.current = clamped;
+      setZoom(clamped);
+      requestAnimationFrame(() => {
+        el.scrollLeft = contentX * clamped - ax;
+        el.scrollTop = contentY * clamped - ay;
+      });
+    },
+    []
+  );
+
+  const fitZoom = useCallback(() => {
+    const el = viewportRef.current;
+    if (!el || el.clientWidth === 0) return;
+    const boardWidth = BOARD_CANVAS_WIDTH + BOARD_FRAME * 2;
+    const next = Math.min(
+      MAX_ZOOM,
+      Math.max(MIN_ZOOM, el.clientWidth / boardWidth)
+    );
+    zoomRef.current = next;
+    setZoom(next);
   }, []);
+
+  // '맞춤' 모드에서는 화면 폭이 바뀔 때마다 다시 맞춘다
+  useIsomorphicLayoutEffect(() => {
+    if (zoomMode !== "fit") return;
+    fitZoom();
+    window.addEventListener("resize", fitZoom);
+    window.addEventListener("orientationchange", fitZoom);
+    return () => {
+      window.removeEventListener("resize", fitZoom);
+      window.removeEventListener("orientationchange", fitZoom);
+    };
+  }, [fitZoom, zoomMode]);
+
+  // 두 손가락 핀치 줌(터치) + Ctrl/⌘ 휠 줌(데스크톱)
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (!el) return;
+
+    let startDistance = 0;
+    let startZoom = 1;
+    const distance = (touches: TouchList) =>
+      Math.hypot(
+        touches[0].clientX - touches[1].clientX,
+        touches[0].clientY - touches[1].clientY
+      );
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 2) return;
+      startDistance = distance(e.touches);
+      startZoom = zoomRef.current;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length !== 2 || startDistance <= 0) return;
+      e.preventDefault();
+      setZoomMode("manual");
+      applyZoom(startZoom * (distance(e.touches) / startDistance), {
+        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+      });
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) startDistance = 0;
+    };
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      setZoomMode("manual");
+      applyZoom(zoomRef.current * (e.deltaY < 0 ? 1.1 : 1 / 1.1), {
+        x: e.clientX,
+        y: e.clientY
+      });
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    el.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
+      el.removeEventListener("wheel", onWheel);
+    };
+  }, [applyZoom]);
 
   const initialCharSlots = useMemo(
     () =>
@@ -1524,9 +1637,14 @@ export default function Page() {
     const bottomSectionHeight = 220;
     const petVerticalInset = 4;
     const petBoxHeight = bottomSectionHeight - petVerticalInset * 2;
-    
+    // PreviewCanvas 의 높이 계산과 동일해야 한다
+    const slotsHeight = charImageHeight + cardImageHeight + equipBlockHeight + 32;
+    const canvasHeight =
+      padding + slotsHeight + 12 + bottomSectionHeight + padding;
+
     return {
       layoutWidth: width,
+      canvasHeight,
       padding,
       slotWidth,
       charImageHeight,
@@ -1561,13 +1679,6 @@ export default function Page() {
             >
               <IconLayers className="h-3.5 w-3.5" />
               프리셋
-            </button>
-            <button
-              onClick={() => setCompactView((v) => !v)}
-              className="hidden rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/70 transition hover:border-white/30 hover:text-white md:inline-flex"
-              aria-pressed={compactView}
-            >
-              {compactView ? "넓게 보기" : "좁게 보기"}
             </button>
             <button
               onClick={handleSave}
@@ -1825,14 +1936,85 @@ export default function Page() {
         </div>
       )}
 
-      <section className="relative flex w-full justify-center overflow-x-auto">
+      <section className="relative flex w-full flex-col gap-2">
+        {/* 확대/축소 컨트롤 — 좁은 화면에서도 1280 레이아웃 그대로 보고 편집한다 */}
+        <div className="flex items-center justify-between gap-2">
+          <p className="hidden text-[11px] text-white/40 sm:block">
+            두 손가락으로 확대·축소, 좌우로 밀어 이동할 수 있어요.
+          </p>
+          <div className="ml-auto flex flex-shrink-0 items-center gap-0.5 rounded-full border border-white/15 bg-white/5 p-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                setZoomMode("manual");
+                applyZoom(zoomRef.current - 0.1);
+              }}
+              disabled={zoom <= MIN_ZOOM}
+              className="h-8 w-8 rounded-full text-base font-semibold leading-none text-white/70 transition hover:bg-white/10 hover:text-white disabled:opacity-30"
+              aria-label="축소"
+            >
+              −
+            </button>
+            <span className="w-11 text-center text-[11px] tabular-nums text-white/60">
+              {Math.round(zoom * 100)}%
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setZoomMode("manual");
+                applyZoom(zoomRef.current + 0.1);
+              }}
+              disabled={zoom >= MAX_ZOOM}
+              className="h-8 w-8 rounded-full text-base font-semibold leading-none text-white/70 transition hover:bg-white/10 hover:text-white disabled:opacity-30"
+              aria-label="확대"
+            >
+              +
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setZoomMode("fit");
+                fitZoom();
+              }}
+              aria-pressed={zoomMode === "fit"}
+              className={`rounded-full px-3 py-1.5 text-[11px] font-semibold transition ${
+                zoomMode === "fit"
+                  ? "bg-white/20 text-white"
+                  : "text-white/60 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              맞춤
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setZoomMode("manual");
+                applyZoom(1);
+              }}
+              className="rounded-full px-3 py-1.5 text-[11px] font-semibold text-white/60 transition hover:bg-white/10 hover:text-white"
+            >
+              100%
+            </button>
+          </div>
+        </div>
+
         <div
-          className={`relative max-w-full rounded border border-white/10 bg-canvas p-2 shadow-2xl shadow-black/50 origin-top-left sm:p-4 ${
-            compactView
-              ? "scale-100 md:scale-[0.85]"
-              : "scale-100 md:scale-[1.1]"
-          }`}
+          ref={viewportRef}
+          className="w-full overflow-auto overscroll-x-contain scrollbar-thin"
+          style={{ touchAction: "pan-x pan-y" }}
         >
+          {/* 축소된 보드가 차지하는 실제 크기만큼 자리를 잡아주는 래퍼 */}
+          <div
+            className="mx-auto"
+            style={{
+              width: `${(BOARD_CANVAS_WIDTH + BOARD_FRAME * 2) * zoom}px`,
+              height: `${(canvasLayout.canvasHeight + BOARD_FRAME * 2) * zoom}px`
+            }}
+          >
+            <div
+              className="relative w-max rounded border border-white/10 bg-canvas p-4 shadow-2xl shadow-black/50"
+              style={{ transform: `scale(${zoom})`, transformOrigin: "top left" }}
+            >
           <PreviewCanvas
             ref={canvasRef}
             charSlots={charSlots}
@@ -1843,7 +2025,7 @@ export default function Page() {
           
           {/* 편집용 DOM UI - 클릭 가능한 오버레이 */}
           {/* 컨테이너의 p-4 (16px) 패딩을 고려하여 오버레이 배치 */}
-          <div className="pointer-events-none absolute inset-2 sm:inset-4">
+          <div className="pointer-events-none absolute inset-4">
             <div className="w-full h-full pointer-events-auto flex flex-col" style={{ 
               paddingLeft: `${canvasLayout.padding}px`, 
               paddingTop: `${canvasLayout.padding}px`,
@@ -2114,6 +2296,8 @@ export default function Page() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
             </div>
           </div>
         </div>
